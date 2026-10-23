@@ -57,7 +57,7 @@ in [`examples/`](examples/README.md).
 You need Linux, an NVIDIA GPU with 8 GB or more, 16 GB of RAM, about 25 GB of disk, and `git`, `ffmpeg`, `curl` and
 [`uv`](https://docs.astral.sh/uv/). Node.js 22+ and Chrome are only needed to lay out UI workflows.
 ```bash
-git clone https://github.com/PhatStraw/freefield.git && cd freefield
+git clone https://github.com/droppedmyza/freefield.git && cd freefield
 scripts/setup.sh            # ComfyUI, PyTorch (cu130), ComfyUI-GGUF, comfy-sdk, comfy-api-proxy, FreeField, ~21 GB of open weights
 scripts/start_comfy.sh      # ComfyUI on :8188 and the Comfy API v2 proxy on :8189
 .runtime/venv/bin/python -m freefield serve        # the gallery app on http://127.0.0.1:8190
