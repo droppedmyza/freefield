@@ -1,0 +1,53 @@
+{
+  "id": "product-freeze",
+  "name": "Product Freeze Ad",
+  "family": "camera",
+  "pipeline": "product_freeze",
+  "description": "Your product frozen mid-splash while the camera glides around the moment, your offer in the safe area at the top, then an end card with your original photo. A 6-second 9:16 ad. Changing the text re-uses the render.",
+  "graph": "product_freeze.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your product",
+      "bind": [
+        "product.image"
+      ]
+    },
+    "offer": {
+      "type": "text",
+      "label": "Offer text (optional, e.g. SPRING SALE -30%)",
+      "required": false,
+      "max_length": 40,
+      "bind": [
+        "pipeline:offer"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "freeze_noise.noise_seed"
+      ]
+    }
+  },
+  "outputs": [
+    "freeze_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "depth_anything_v2_small"
+  ],
+  "license": "Apache-2.0 weights (FLUX.2 klein 4B; Depth Anything V2 Small); camera, text and end card are made by FreeField; the product photo is yours",
+  "tags": [
+    "camera",
+    "product",
+    "ad",
+    "9:16",
+    "8gb-profile"
+  ],
+  "preview": "preview.mp4"
+}

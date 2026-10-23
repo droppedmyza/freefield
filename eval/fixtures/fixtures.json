@@ -1,0 +1,30 @@
+{
+  "style": "casual smartphone selfie photo, head and shoulders, looking at the camera, natural window light, realistic skin texture, slight smile, plain indoor background, sharp focus, 35mm photo",
+  "people": [
+    {
+      "name": "dev-1",
+      "who": "a woman in her late twenties with curly dark hair and brown skin, wearing a denim jacket",
+      "seed": 101
+    },
+    {
+      "name": "dev-2",
+      "who": "a man in his thirties with short blond hair and a light beard, wearing a grey hoodie",
+      "seed": 202
+    },
+    {
+      "name": "dev-3",
+      "who": "an East Asian woman in her forties with a black bob haircut and round glasses, wearing a white shirt",
+      "seed": 303
+    },
+    {
+      "name": "heldout-1",
+      "who": "a South Asian man in his twenties with wavy black hair, wearing a green t-shirt",
+      "seed": 404
+    },
+    {
+      "name": "heldout-2",
+      "who": "an older man in his sixties with grey hair and a mustache, wearing a navy sweater",
+      "seed": 505
+    }
+  ]
+}

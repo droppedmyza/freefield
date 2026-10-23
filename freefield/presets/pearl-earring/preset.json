@@ -1,0 +1,26 @@
+{
+  "id": "pearl-earring",
+  "name": "Pearl Earring",
+  "family": "museum",
+  "description": "You, painted into Vermeer's Girl with a Pearl Earring and brought to life. The original sits underneath: the split-screen 'me vs. the masterpiece' format.",
+  "graph": "selfie_art_split.json",
+  "inputs": {
+    "photo": {"type": "image", "label": "A clear photo of your face", "bind": ["photo.image"]}
+  },
+  "params": {
+    "seed": {"type": "int", "default": 42, "min": 0, "max": 2147483647, "bind": ["keyframe_noise.noise_seed", "video_sample.seed"]}
+  },
+  "fixed": {
+    "artwork.image": "asset:painting.jpg",
+    "artwork_ref.image": "asset:painting_noface.jpg",
+    "keyframe_prompt.text": "Image 2 is an oil painting whose face has been left blank. Paint the face and head of the person from image 1 into the blank area, turned over the shoulder toward the viewer, so the painting shows that person: looking back over the shoulder toward the viewer, blue and yellow turban, a large pearl earring, plain dark background, soft light from the left. Oil on canvas with visible brushstrokes and fine craquelure, Dutch Golden Age portrait. It must be the same person as image 1: same face, skin tone, age and gender.",
+    "motion_prompt.text": "An oil painting comes to life. The person slowly turns their head toward the viewer, blinks and gives a slight knowing smile, the pearl earring catches the light. Subtle movement, static camera. The background stays a smooth, plain, solid dark brown, completely still.",
+    "artwork_caption.text": "Vermeer, 1665"
+  },
+  "outputs": ["clip_save", "keyframe_save"],
+  "models": ["flux-2-klein-4b-fp8.safetensors", "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"],
+  "license": "apache-2.0 weights; painting public domain (Wikimedia Commons)",
+  "credits": {"painting.jpg": "Johannes Vermeer, Girl with a Pearl Earring (1665), public domain, https://commons.wikimedia.org/wiki/File:1665_Girl_with_a_Pearl_Earring.jpg",
+              "painting_noface.jpg": "painting.jpg with the face blanked by scripts/blank_face.py (keyframe reference only)"},
+  "tags": ["painting", "split-screen", "art"]
+}

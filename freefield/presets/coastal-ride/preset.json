@@ -1,0 +1,46 @@
+{
+  "id": "coastal-ride",
+  "name": "Coastal Ride",
+  "family": "ride",
+  "description": "You on a vintage scooter, cruising a cliffside coast road at golden hour with the sea behind you.",
+  "graph": "selfie_to_clip.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "keyframe_noise.noise_seed",
+        "video_sample.seed"
+      ]
+    }
+  },
+  "fixed": {
+    "keyframe_prompt.text": "The person from image 1 rides a mint-green vintage Italian scooter along a winding coastal cliff road at golden hour, both hands on the handlebars, smiling, no helmet. Seen from the front at eye level, the rider sits upright and fills the upper middle of the frame, with nothing in front of their face. The same face, hairstyle, skin tone and features as image 1, face clearly visible. Warm sunset light, the sparkling ocean and cliffs behind. Cinematic medium shot, sharp focus on the face.",
+    "motion_prompt.text": "The scooter cruises along the coast road toward the camera. The rider smiles, clothes fluttering in the wind, warm sunlight flickering across their face. The camera moves backward in front of the scooter at the same speed, keeping the rider centered."
+  },
+  "outputs": [
+    "clip_save",
+    "keyframe_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"
+  ],
+  "license": "apache-2.0 weights",
+  "tags": [
+    "ride",
+    "scooter",
+    "golden-hour"
+  ]
+}

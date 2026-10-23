@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreeField · open viral presets on Comfy</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="dot"></span>FreeField</div>
+  <p class="tag">Higgsfield-style viral presets. Open source, open weights, running on <b>your</b> GPU through Comfy.</p>
+  <button id="make" class="btn make" type="button">Make an effect</button>
+  <div id="health" class="health" title="Comfy API status">checking Comfy…</div>
+</header>
+
+<main>
+  <div class="filters" id="filters"></div>
+  <section id="grid" class="grid" aria-live="polite"></section>
+</main>
+
+<div id="sheet" class="sheet" hidden>
+  <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <button class="close" id="close" aria-label="Close">×</button>
+    <div class="sheet-body">
+      <div class="sheet-media" id="sheet-media"></div>
+      <div class="sheet-side">
+        <h2 id="sheet-title"></h2>
+        <p id="sheet-desc" class="muted"></p>
+
+        <form id="form">
+          <label class="drop" id="drop">
+            <input type="file" id="photo" name="photo" accept="image/*" capture="user" hidden>
+            <img id="photo-preview" alt="" hidden>
+            <video id="clip-preview" muted loop playsinline autoplay hidden></video>
+            <span id="drop-text">Drop a selfie here, or tap to choose one</span>
+          </label>
+          <div id="texts"></div>
+          <details class="adv"><summary>Advanced</summary>
+            <label>Seed <input type="number" id="seed" min="0" max="2147483647" placeholder="random"></label>
+          </details>
+          <button type="submit" id="go" class="go" disabled>Generate</button>
+          <p class="fine" id="fine">Use a photo of yourself or someone who said yes. Nothing leaves this machine.</p>
+        </form>
+
+        <div id="progress" class="progress" hidden>
+          <div class="bar"><span id="bar-fill"></span></div>
+          <p id="stage" class="stage">Queued…</p>
+          <p id="elapsed" class="muted small"></p>
+        </div>
+
+        <div id="result" class="result" hidden>
+          <div class="actions">
+            <a id="download" class="btn" download>Download</a>
+            <button id="share" class="btn" type="button">Share</button>
+            <button id="again" class="btn ghost" type="button">Again (new seed)</button>
+          </div>
+          <p id="result-meta" class="muted small"></p>
+          <p id="result-warning" class="warning small" hidden></p>
+        </div>
+        <p id="error" class="error" hidden></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="builder" class="sheet" hidden>
+  <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="b-title">
+    <button class="close" id="b-close" aria-label="Close">×</button>
+    <div class="sheet-body">
+      <div class="sheet-media" id="b-media"><div class="ph">🛠️</div></div>
+      <div class="sheet-side">
+        <h2 id="b-title">Make an effect</h2>
+        <p class="muted">Say what you become, then what happens. Add "with a before/after reveal", "side by side with my photo" or
+          titled "YOUR TITLE" if you want them. The builder assembles a ComfyUI graph from tested stages, checks it, renders a
+          preview on your GPU, and publishes only when you approve.</p>
+        <form id="b-form">
+          <textarea id="b-desc" rows="3" maxlength="400" placeholder='make me a paper cutout, then I slowly turn my head and smile, with a before/after reveal, titled "PAPER ME"'></textarea>
+          <button type="submit" class="go" id="b-draft">Draft it</button>
+        </form>
+        <div id="b-recipe" class="recipe" hidden></div>
+        <p id="b-errors" class="error" hidden></p>
+        <div id="b-render" hidden>
+          <label class="drop" id="b-drop">
+            <input type="file" id="b-photo" accept="image/*" hidden>
+            <span id="b-drop-text">Choose a photo for the preview</span>
+          </label>
+          <button type="button" class="go" id="b-preview" disabled>Render the preview (about 2 minutes)</button>
+        </div>
+        <div id="b-progress" class="progress" hidden><div class="bar"><span id="b-bar"></span></div><p id="b-stage" class="stage"></p></div>
+        <div id="b-approve" hidden>
+          <p id="b-checks" class="muted small"></p>
+          <button type="button" class="go" id="b-publish">Looks right: publish it</button>
+          <p class="fine">Publishing is your call: the checks only say the clip rendered and still looks like you, not that it looks good.</p>
+        </div>
+        <p id="b-done" class="muted" hidden></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">
+  FreeField is MIT-licensed. Default models: FLUX.2 [klein] 4B and Wan 2.2 TI2V-5B (Apache-2.0), run via the Comfy SDK.
+  <a href="https://github.com/" id="repo-link">Add your own preset</a>
+</footer>
+<script src="/static/app.js"></script>
+<script src="/static/builder.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+[
+  {
+    "title": "1. Your photo",
+    "color": "#335",
+    "match": [
+      "photo",
+      "reference"
+    ]
+  },
+  {
+    "title": "2. Transform (FLUX.2 klein 4B)",
+    "color": "#353",
+    "match": [
+      "klein_",
+      "keyframe",
+      "photo_",
+      "reference_"
+    ]
+  },
+  {
+    "title": "3. Animate (Wan 2.2 TI2V-5B)",
+    "color": "#533",
+    "match": [
+      "wan_",
+      "motion_",
+      "video_"
+    ]
+  },
+  {
+    "title": "4. Reveal (masked composition)",
+    "color": "#553",
+    "match": [
+      "before",
+      "wipe",
+      "reveal"
+    ]
+  },
+  {
+    "title": "5. Title card",
+    "color": "#535",
+    "match": [
+      "header",
+      "titled"
+    ]
+  },
+  {
+    "title": "Save",
+    "color": "#444",
+    "match": [
+      "watermark",
+      "video",
+      "clip_save"
+    ]
+  }
+]

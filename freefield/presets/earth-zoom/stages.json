@@ -1,0 +1,40 @@
+[
+  {
+    "title": "1. Your place (frame 0 of your clip, or your photo)",
+    "color": "#335",
+    "match": [
+      "frame0"
+    ]
+  },
+  {
+    "title": "FLUX.2 klein 4B (all three views)",
+    "color": "#353",
+    "match": [
+      "klein_"
+    ]
+  },
+  {
+    "title": "2. Drone view of your place",
+    "color": "#533",
+    "match": [
+      "drone"
+    ]
+  },
+  {
+    "title": "3. Satellite view (the drone view outpainted from above)",
+    "color": "#553",
+    "match": [
+      "drone_small",
+      "gray",
+      "outpaint",
+      "satellite"
+    ]
+  },
+  {
+    "title": "4. Earth from space",
+    "color": "#355",
+    "match": [
+      "globe"
+    ]
+  }
+]

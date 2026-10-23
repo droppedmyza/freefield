@@ -1,0 +1,21 @@
+{
+  "id": "superstar",
+  "name": "Superstar",
+  "family": "spotlight",
+  "description": "Stadium lights, a sea of raised phones, and your face taking over the jumbotron, seen from deep inside the crowd.",
+  "graph": "selfie_to_clip.json",
+  "inputs": {
+    "photo": {"type": "image", "label": "A clear photo of your face", "bind": ["photo.image"]}
+  },
+  "params": {
+    "seed": {"type": "int", "default": 42, "min": 0, "max": 2147483647, "bind": ["keyframe_noise.noise_seed", "video_sample.seed"]}
+  },
+  "fixed": {
+    "keyframe_prompt.text": "A giant stadium jumbotron screen at a night concert shows a close-up of the person from image 1, smiling, with the same face, hairstyle and features. Photographed from deep inside the cheering crowd: dark silhouettes of fans in the foreground holding up glowing phone screens, colorful stage lights and haze beams, confetti in the air. Wide shot, the face on the screen is large and clearly recognizable.",
+    "motion_prompt.text": "Handheld camera inside a cheering concert crowd. Fans wave their glowing phones, stage light beams sweep through the haze, confetti falls, and the face on the giant jumbotron smiles and waves to the crowd."
+  },
+  "outputs": ["clip_save", "keyframe_save"],
+  "models": ["flux-2-klein-4b-fp8.safetensors", "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"],
+  "license": "apache-2.0 weights",
+  "tags": ["concert", "crowd"]
+}

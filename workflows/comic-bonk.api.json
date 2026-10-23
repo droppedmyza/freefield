@@ -1,0 +1,297 @@
+{
+  "photo": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "your_photo.png"
+    },
+    "_meta": {
+      "title": "Your mascot, toy or cartoon (3:4)"
+    }
+  },
+  "bg_model": {
+    "class_type": "LoadBackgroundRemovalModel",
+    "inputs": {
+      "bg_removal_name": "birefnet.safetensors"
+    },
+    "_meta": {
+      "title": "BiRefNet background removal (MIT)"
+    }
+  },
+  "matte": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "bg_model",
+        0
+      ],
+      "image": [
+        "photo",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Cut out the mascot"
+    }
+  },
+  "matte_image": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "matte",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Matte as an image"
+    }
+  },
+  "matte_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "matte_image",
+        0
+      ],
+      "filename_prefix": "freefield/bonk_matte"
+    },
+    "_meta": {
+      "title": "Save the matte"
+    }
+  },
+  "klein_model": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b-fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "FLUX.2 klein 4B (Apache-2.0)"
+    }
+  },
+  "klein_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3-4B text encoder"
+    }
+  },
+  "klein_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "plate_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Remove the toy from image 1 completely and show the empty background where it stood: the same surfaces, the same objects, the same light and the same camera angle. Nothing else changes. No toy, no people, no text.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Clean plate: Keyframe prompt (what the still should show)"
+    }
+  },
+  "plate_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "plate_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Clean plate: Empty negative (CFG 1)"
+    }
+  },
+  "plate_photo_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "Clean plate: Reference 1: scale to ~1MP"
+    }
+  },
+  "plate_photo_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "plate_photo_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Clean plate: Reference 1: encode"
+    }
+  },
+  "plate_photo_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "plate_prompt",
+        0
+      ],
+      "latent": [
+        "plate_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Clean plate: Attach reference 1 (positive)"
+    }
+  },
+  "plate_photo_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "plate_negative",
+        0
+      ],
+      "latent": [
+        "plate_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Clean plate: Attach reference 1 (negative)"
+    }
+  },
+  "plate_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "plate_photo_ref_pos",
+        0
+      ],
+      "negative": [
+        "plate_photo_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Clean plate: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "plate_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 5
+    },
+    "_meta": {
+      "title": "Clean plate: Keyframe seed"
+    }
+  },
+  "plate_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Clean plate: Sampler"
+    }
+  },
+  "plate_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 768,
+      "height": 1024
+    },
+    "_meta": {
+      "title": "Clean plate: 4-step schedule"
+    }
+  },
+  "plate_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 768,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Clean plate: Keyframe canvas"
+    }
+  },
+  "plate_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "plate_noise",
+        0
+      ],
+      "guider": [
+        "plate_guider",
+        0
+      ],
+      "sampler": [
+        "plate_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "plate_sigmas",
+        0
+      ],
+      "latent_image": [
+        "plate_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Clean plate: Generate keyframe"
+    }
+  },
+  "plate": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "plate_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Clean plate: Keyframe image"
+    }
+  },
+  "plate_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "plate",
+        0
+      ],
+      "filename_prefix": "freefield/plate"
+    },
+    "_meta": {
+      "title": "Clean plate: Save keyframe (also used by the eval)"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "penguin-ride",
+  "name": "Penguin Ride",
+  "family": "ride",
+  "description": "You, riding a giant emperor penguin as it belly-slides across the Antarctic ice, arms up and laughing.",
+  "graph": "selfie_to_clip.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "keyframe_noise.noise_seed",
+        "video_sample.seed"
+      ]
+    }
+  },
+  "fixed": {
+    "keyframe_prompt.text": "The person from image 1 sits upright on the back of a giant emperor penguin that belly-slides across the Antarctic ice, wearing a puffy winter jacket, laughing with one arm raised. Seen from a three-quarter side angle: the penguin's head is low and points ahead to the left of the frame, and the rider sits high above it in the upper half of the frame. The same face, hairstyle, skin tone and features as image 1, face clearly visible and turned toward the camera. Snow spray behind the penguin, snowy mountains and a bright blue sky. Medium action shot, cinematic, sharp focus on the face.",
+    "motion_prompt.text": "The giant penguin belly-slides across the ice, carrying the laughing person on its back, who waves one arm. The penguin keeps its head low and pointing ahead. Snow sprays up behind them. The camera tracks alongside them from the side, keeping the same distance."
+  },
+  "outputs": [
+    "clip_save",
+    "keyframe_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"
+  ],
+  "license": "apache-2.0 weights",
+  "tags": [
+    "ride",
+    "absurd",
+    "animals"
+  ]
+}

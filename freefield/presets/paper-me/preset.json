@@ -1,0 +1,90 @@
+{
+  "id": "paper-me",
+  "name": "Paper Me",
+  "family": "built",
+  "description": "You as a paper cutout; then you slowly turn your head and smile. With a before/after reveal.",
+  "graph": "graph.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "keyframe_noise.noise_seed",
+        "video_sample.seed"
+      ]
+    }
+  },
+  "fixed": {
+    "keyframe_prompt.text": "Image 1 is a photo of a person. Make a picture of the exact person from image 1 as paper cutout. Keep the same face, skin tone, age, hair and identity as image 1. One person, vertical portrait framing, the face clearly visible, high detail, no text, no watermark.",
+    "motion_prompt.text": "They slowly turn their head and smile. Smooth, natural motion; the subject stays recognisable. Only the subject moves, alone in the frame; the background stays plain and still. Static shot.",
+    "wipe.file": "asset:paper-me-wipe.mp4",
+    "header.image": "asset:paper-me-header.png"
+  },
+  "outputs": [
+    "clip_save",
+    "keyframe_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "qwen_3_4b_fp8_mixed.safetensors",
+    "flux2-vae.safetensors",
+    "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf",
+    "umt5-xxl-encoder-Q5_K_M.gguf",
+    "wan2.2_vae.safetensors"
+  ],
+  "license": "flux-2-klein-4b-fp8.safetensors apache-2.0; qwen_3_4b_fp8_mixed.safetensors apache-2.0; flux2-vae.safetensors apache-2.0; Wan2_2-TI2V-5B-Turbo-Q6_K.gguf apache-2.0; umt5-xxl-encoder-Q5_K_M.gguf apache-2.0; wan2.2_vae.safetensors apache-2.0",
+  "source": {
+    "made_by": "FreeField effect builder v1",
+    "description": "Make me a paper cutout, then I slowly turn my head and smile, with a before/after reveal, titled \"PAPER ME\"",
+    "recipe": {
+      "name": "Paper Me",
+      "becomes": "paper cutout",
+      "motion": "they slowly turn their head and smile",
+      "reveal": true,
+      "split": false,
+      "title": "PAPER ME",
+      "reference": null,
+      "description": "Make me a paper cutout, then I slowly turn my head and smile, with a before/after reveal, titled \"PAPER ME\"",
+      "subject": "person",
+      "keep": false,
+      "caption": false,
+      "profile": "8gb",
+      "id": "paper-me",
+      "stages": [
+        "transform",
+        "animate",
+        "reveal",
+        "title",
+        "save"
+      ]
+    },
+    "created": "2026-10-18T06:34:37+00:00",
+    "approved": "2026-10-18T06:35:45+00:00",
+    "revised": "2026-10-18: motion changed from 'they pop up off the page' (Wan 2.2 5B drew paper scraps and props on a 4090) to 'they slowly turn their head and smile'"
+  },
+  "credits": {
+    "paper-me-wipe.mp4": "FreeField effect builder v1 (wipe mask) (generated)",
+    "paper-me-header.png": "FreeField effect builder v1 (scripts/make_header.py, Luckiest Guy font, Apache-2.0) (generated)"
+  },
+  "asset_licenses": {
+    "paper-me-wipe.mp4": "generated",
+    "paper-me-header.png": "generated"
+  },
+  "tags": [
+    "built",
+    "reveal",
+    "title"
+  ],
+  "preview": "preview.mp4"
+}

@@ -1,0 +1,119 @@
+{
+  "id": "out-of-the-photo",
+  "name": "Out of the Photo",
+  "family": "breakout",
+  "description": "You, in an old instant photo lying on a wooden desk. Then a small, real you climbs out of the picture and stands on the photo's white border, waving, while the picture behind fades to a blank print.",
+  "graph": "selfie_breakout.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image",
+        "artwork_ref.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "painting_noise.noise_seed",
+        "likeness_noise.noise_seed",
+        "grip_noise.noise_seed",
+        "breakout_noise.noise_seed",
+        "shot1_sample_high.noise_seed",
+        "shot1_sample.noise_seed",
+        "shot2_sample_high.noise_seed",
+        "shot2_sample.noise_seed",
+        "shot3_sample_high.noise_seed",
+        "shot3_sample.noise_seed"
+      ]
+    }
+  },
+  "fixed": {
+    "plate.image": "asset:plate.png",
+    "plate_hole.image": "asset:plate_hole.png",
+    "wall.image": "asset:wall_mask.png",
+    "painting_prompt.text": "Image 1 is a photo of a person. Make a faded vintage 1970s instant photo of this exact person: head and shoulders, smiling at the camera, warm faded colours, soft film grain, the same face, hairstyle, skin tone and clothes as image 1, a plain light background.",
+    "likeness_prompt.text": "Image 1 shows a person. Keep image 1 exactly: the same pose, clothes, background, light and framing. Only make the face match the face of the person in image 2 exactly: the same face shape, skin tone, eyes, nose, mouth, age and facial hair.",
+    "grip_prompt.text": "Image 1 shows a vintage instant photo lying on a wooden desk; the photo shows a person. Image 2 is a photo of that person. Edit only the picture area of the photo in image 1: the person in the photo has come alive, leans toward the viewer with a delighted grin, and both of their hands now rest on the bottom edge of the picture area, inside the photo, fingertips curling over the inner edge of the picture onto the white border. They still look like a faded instant photo. The white border, the desk, the pencil and the cup do not change: the same light, the same camera.",
+    "breakout_prompt.text": "Image 1 shows a person. Image 2 shows a wooden desk with a vintage instant photo whose picture area is a blank, faded, cream-coloured print with nothing on it. Edit image 2: a small, real, three-dimensional version of the person from image 1, about as tall as the photo, has climbed out of the photo and now stands on the photo's thick white border at the bottom, both feet planted on it, casting a soft shadow, smiling up at the viewer. Exactly the person in image 1: the same face, skin tone, hairstyle and clothes, in the same colours. The picture area behind them stays a blank, faded print. The same desk, the same pencil and cup, the same light, the same camera.",
+    "shot1_prompt.text": "The person in the vintage instant photo comes alive: they lean toward the viewer with a delighted grin and their hands come forward inside the picture and rest on its bottom edge, fingertips curling over onto the white border. The camera holds perfectly still. The desk and the photo stay still.",
+    "shot2_prompt.text": "The person climbs out of the instant photo: as they pull themselves out, the picture behind them fades to a blank, faded cream print, and they step out onto the photo's thick white border, a small, real person with both feet on it, casting a shadow, wearing the same clothes in the same colours. The camera pulls back smoothly. The desk and the photo stay still.",
+    "shot3_prompt.text": "The small person standing on the white border of the instant photo glances back at the blank picture behind them, then looks up at the camera, smiles and waves. The camera holds perfectly still: no zoom, no push-in. Nothing else enters the shot; the edges of the desk stay empty. The desk and the photo stay still.",
+    "painting_fit.width": 433,
+    "painting_fit.height": 478,
+    "start_frame.x": 145,
+    "start_frame.y": 370,
+    "painting_empty.width": 592,
+    "painting_empty.height": 656,
+    "painting_sigmas.width": 592,
+    "painting_sigmas.height": 656,
+    "likeness_empty.width": 592,
+    "likeness_empty.height": 656,
+    "likeness_sigmas.width": 592,
+    "likeness_sigmas.height": 656,
+    "start_view_crop.x": 4,
+    "start_view_crop.y": 0,
+    "start_view_crop.width": 714,
+    "start_view_crop.height": 1270,
+    "grip_view_crop.x": 4,
+    "grip_view_crop.y": 0,
+    "grip_view_crop.width": 714,
+    "grip_view_crop.height": 1270,
+    "shot1_wall_crop.x": 4,
+    "shot1_wall_crop.y": 0,
+    "shot1_wall_crop.width": 714,
+    "shot1_wall_crop.height": 1270,
+    "breakout_photo_scaled.image": [
+      "likeness",
+      0
+    ],
+    "breakout_start_frame_latent.pixels": [
+      "plate",
+      0
+    ]
+  },
+  "outputs": [
+    "clip_save",
+    "start_save",
+    "grip_save",
+    "breakout_save",
+    "proof_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors"
+  ],
+  "license": "apache-2.0 weights; plate generated with FLUX.2 klein (no people) by freefield/factory.py",
+  "credits": {
+    "plate.png": "generated by the preset factory from: Top-down view, slightly angled, of a warm wooden desk in soft window light. One vintage instant photo lies flat on the desk, centered, filling about half of the image width, with a thick white border, a wider white strip at the bottom, slightly curled corners. The photo's picture area inside the white border is filled with flat, solid, pure magenta color, perfectly uniform, no texture. A pencil and a coffee cup at the edges of the desk. Photorealistic photo, 35mm, sharp, no people, no text."
+  },
+  "tags": [
+    "photo",
+    "miniature",
+    "breakout",
+    "factory",
+    "studio-profile"
+  ],
+  "gate": {
+    "hole": [
+      145,
+      370,
+      433,
+      478
+    ],
+    "rerolls": 5,
+    "grip_edge": "bottom",
+    "frame_border": 24,
+    "rail": 70,
+    "identity_min": 0.3,
+    "painting_identity_min": 0.3
+  },
+  "preview": "preview.mp4"
+}

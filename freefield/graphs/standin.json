@@ -1,0 +1,504 @@
+{
+  "photo": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": ""
+    },
+    "_meta": {
+      "title": "Synthetic test face"
+    }
+  },
+  "klein_model": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b-fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "FLUX.2 klein 4B (Apache-2.0)"
+    }
+  },
+  "klein_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3-4B text encoder"
+    }
+  },
+  "klein_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "wide_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Image 1 is a selfie. Make a photo of the exact same person taken by a phone propped on a shelf about two metres away: they sit at a table, small in the picture, their head only about a tenth of the picture's height, their whole upper body and their arms resting on the table, with plenty of space above and around them, looking into the lens with a calm face, the same clothes, in a plain room with natural window light. Vertical phone photo, photorealistic. The same face, skin tone, age and hair as image 1.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Keyframe prompt (what the still should show)"
+    }
+  },
+  "wide_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "wide_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Empty negative (CFG 1)"
+    }
+  },
+  "wide_photo_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Reference 1: scale to ~1MP"
+    }
+  },
+  "wide_photo_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "wide_photo_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Reference 1: encode"
+    }
+  },
+  "wide_photo_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "wide_prompt",
+        0
+      ],
+      "latent": [
+        "wide_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Attach reference 1 (positive)"
+    }
+  },
+  "wide_photo_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "wide_negative",
+        0
+      ],
+      "latent": [
+        "wide_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Attach reference 1 (negative)"
+    }
+  },
+  "wide_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "wide_photo_ref_pos",
+        0
+      ],
+      "negative": [
+        "wide_photo_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "wide_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Keyframe seed"
+    }
+  },
+  "wide_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Sampler"
+    }
+  },
+  "wide_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "Propped-phone framing: 4-step schedule"
+    }
+  },
+  "wide_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Keyframe canvas"
+    }
+  },
+  "wide_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "wide_noise",
+        0
+      ],
+      "guider": [
+        "wide_guider",
+        0
+      ],
+      "sampler": [
+        "wide_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "wide_sigmas",
+        0
+      ],
+      "latent_image": [
+        "wide_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Generate keyframe"
+    }
+  },
+  "wide": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "wide_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Keyframe image"
+    }
+  },
+  "wide_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "wide",
+        0
+      ],
+      "filename_prefix": "freefield/wide"
+    },
+    "_meta": {
+      "title": "Propped-phone framing: Save keyframe (also used by the eval)"
+    }
+  },
+  "wan14_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "umt5-xxl text encoder (fp8)"
+    }
+  },
+  "wan14_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    },
+    "_meta": {
+      "title": "Wan 2.1 VAE (used by the 14B models)"
+    }
+  },
+  "wan14_high": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Wan 2.2 I2V-A14B high-noise expert (fp8)"
+    }
+  },
+  "wan14_high_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "wan14_high",
+        0
+      ],
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "lightx2v 4-step LoRA (high noise)"
+    }
+  },
+  "wan14_high_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan14_high_lora",
+        0
+      ],
+      "shift": 5.0
+    },
+    "_meta": {
+      "title": "Sampling shift (high)"
+    }
+  },
+  "wan14_low": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Wan 2.2 I2V-A14B low-noise expert (fp8)"
+    }
+  },
+  "wan14_low_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "wan14_low",
+        0
+      ],
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "lightx2v 4-step LoRA (low noise)"
+    }
+  },
+  "wan14_low_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan14_low_lora",
+        0
+      ],
+      "shift": 5.0
+    },
+    "_meta": {
+      "title": "Sampling shift (low)"
+    }
+  },
+  "lean_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Video from a phone propped on a shelf. The person at the table sits still looking into the lens for a second, then stands up and leans far forward toward the phone, coming much closer, until their head and shoulders fill most of the picture, breaking into a big warm smile. Their hands stay down out of the picture. Natural light, real footage. The camera does not move.",
+      "clip": [
+        "wan14_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Lean in toward the phone: motion prompt"
+    }
+  },
+  "lean_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "lean_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty negative (CFG 1)"
+    }
+  },
+  "lean_latent": {
+    "class_type": "WanImageToVideo",
+    "inputs": {
+      "positive": [
+        "lean_prompt",
+        0
+      ],
+      "negative": [
+        "lean_negative",
+        0
+      ],
+      "vae": [
+        "wan14_vae",
+        0
+      ],
+      "width": 720,
+      "height": 1280,
+      "length": 81,
+      "batch_size": 1,
+      "start_image": [
+        "wide",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Lean in toward the phone: pin the first frame"
+    }
+  },
+  "lean_sample_high": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "wan14_high_shift",
+        0
+      ],
+      "latent_image": [
+        "lean_latent",
+        2
+      ],
+      "add_noise": "enable",
+      "start_at_step": 0,
+      "end_at_step": 2,
+      "return_with_leftover_noise": "enable",
+      "positive": [
+        "lean_latent",
+        0
+      ],
+      "negative": [
+        "lean_latent",
+        1
+      ],
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "steps": 4,
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Lean in toward the phone: motion layout, steps 0-2 (high-noise expert)"
+    }
+  },
+  "lean_sample": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "wan14_low_shift",
+        0
+      ],
+      "latent_image": [
+        "lean_sample_high",
+        0
+      ],
+      "add_noise": "disable",
+      "start_at_step": 2,
+      "end_at_step": 10000,
+      "return_with_leftover_noise": "disable",
+      "positive": [
+        "lean_latent",
+        0
+      ],
+      "negative": [
+        "lean_latent",
+        1
+      ],
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "steps": 4,
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Lean in toward the phone: detail, steps 2-4 (low-noise expert)"
+    }
+  },
+  "lean_frames": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "lean_sample",
+        0
+      ],
+      "vae": [
+        "wan14_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Lean in toward the phone: decode frames"
+    }
+  },
+  "video": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": [
+        "lean_frames",
+        0
+      ],
+      "fps": 16.0
+    },
+    "_meta": {
+      "title": "Frames to video"
+    }
+  },
+  "clip_save": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": [
+        "video",
+        0
+      ],
+      "filename_prefix": "freefield/standin",
+      "format": "mp4",
+      "format.codec": "h264"
+    },
+    "_meta": {
+      "title": "Save the stand-in clip"
+    }
+  }
+}

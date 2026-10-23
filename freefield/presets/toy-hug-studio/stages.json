@@ -1,0 +1,31 @@
+[
+  {
+    "title": "1. Your photo",
+    "color": "#335",
+    "match": [
+      "photo",
+      "reference",
+      "start"
+    ]
+  },
+  {
+    "title": "2. Animate (Wan 2.2 I2V-A14B, studio profile)",
+    "color": "#533",
+    "match": [
+      "wan_",
+      "wan14_",
+      "motion_",
+      "motion",
+      "video_"
+    ]
+  },
+  {
+    "title": "Save",
+    "color": "#444",
+    "match": [
+      "watermark",
+      "video",
+      "clip_save"
+    ]
+  }
+]

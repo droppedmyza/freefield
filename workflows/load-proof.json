@@ -1,0 +1,155 @@
+{
+  "comfyui": "http://127.0.0.1:8188",
+  "checked": "2026-10-23T09:11:14.432Z",
+  "results": [
+    {
+      "workflow": "comic-bonk.json",
+      "file_nodes": 23,
+      "note_nodes": 1,
+      "loaded_nodes": 23,
+      "links": 24,
+      "missing_node_types": [],
+      "prompt_nodes": 22,
+      "converts_back": true,
+      "models_not_on_this_machine": []
+    },
+    {
+      "workflow": "earth-zoom.json",
+      "file_nodes": 50,
+      "note_nodes": 1,
+      "loaded_nodes": 50,
+      "links": 63,
+      "missing_node_types": [],
+      "prompt_nodes": 49,
+      "converts_back": true,
+      "models_not_on_this_machine": []
+    },
+    {
+      "workflow": "mascot-outfit-switch.json",
+      "file_nodes": 37,
+      "note_nodes": 1,
+      "loaded_nodes": 37,
+      "links": 41,
+      "missing_node_types": [],
+      "prompt_nodes": 36,
+      "converts_back": true,
+      "models_not_on_this_machine": []
+    },
+    {
+      "workflow": "out-of-the-frame.json",
+      "file_nodes": 133,
+      "note_nodes": 1,
+      "loaded_nodes": 133,
+      "links": 200,
+      "missing_node_types": [],
+      "prompt_nodes": 132,
+      "converts_back": true,
+      "models_not_on_this_machine": [
+        "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+        "wan_2.1_vae.safetensors",
+        "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+        "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors"
+      ]
+    },
+    {
+      "workflow": "out-of-the-photo.json",
+      "file_nodes": 133,
+      "note_nodes": 1,
+      "loaded_nodes": 133,
+      "links": 200,
+      "missing_node_types": [],
+      "prompt_nodes": 132,
+      "converts_back": true,
+      "models_not_on_this_machine": [
+        "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+        "wan_2.1_vae.safetensors",
+        "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+        "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors"
+      ]
+    },
+    {
+      "workflow": "paper-me.json",
+      "file_nodes": 40,
+      "note_nodes": 1,
+      "loaded_nodes": 40,
+      "links": 44,
+      "missing_node_types": [],
+      "prompt_nodes": 39,
+      "converts_back": true,
+      "models_not_on_this_machine": []
+    },
+    {
+      "workflow": "pet-to-human-studio.json",
+      "file_nodes": 44,
+      "note_nodes": 1,
+      "loaded_nodes": 44,
+      "links": 52,
+      "missing_node_types": [],
+      "prompt_nodes": 43,
+      "converts_back": true,
+      "models_not_on_this_machine": [
+        "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+        "wan_2.1_vae.safetensors",
+        "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+        "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors"
+      ]
+    },
+    {
+      "workflow": "product-freeze.json",
+      "file_nodes": 19,
+      "note_nodes": 1,
+      "loaded_nodes": 19,
+      "links": 20,
+      "missing_node_types": [],
+      "prompt_nodes": 18,
+      "converts_back": true,
+      "models_not_on_this_machine": []
+    },
+    {
+      "workflow": "raven-intro.json",
+      "file_nodes": 15,
+      "note_nodes": 1,
+      "loaded_nodes": 15,
+      "links": 15,
+      "missing_node_types": [],
+      "prompt_nodes": 14,
+      "converts_back": true,
+      "models_not_on_this_machine": []
+    },
+    {
+      "workflow": "raven-poof.json",
+      "file_nodes": 15,
+      "note_nodes": 1,
+      "loaded_nodes": 15,
+      "links": 15,
+      "missing_node_types": [],
+      "prompt_nodes": 14,
+      "converts_back": true,
+      "models_not_on_this_machine": []
+    },
+    {
+      "workflow": "toy-hug-studio.json",
+      "file_nodes": 20,
+      "note_nodes": 1,
+      "loaded_nodes": 20,
+      "links": 24,
+      "missing_node_types": [],
+      "prompt_nodes": 19,
+      "converts_back": true,
+      "models_not_on_this_machine": [
+        "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+        "wan_2.1_vae.safetensors",
+        "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+        "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors"
+      ]
+    }
+  ]
+}

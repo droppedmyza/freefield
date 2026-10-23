@@ -1,0 +1,108 @@
+{
+  "id": "out-of-the-photo",
+  "spec": {
+    "id": "out-of-the-photo",
+    "name": "Out of the Photo",
+    "description": "You, in an old instant photo lying on a wooden desk. Then a small, real you climbs out of the picture and stands on the photo's white border, waving, while the picture behind fades to a blank print.",
+    "scene": "Top-down view, slightly angled, of a warm wooden desk in soft window light. One vintage instant photo lies flat on the desk, centered, filling about half of the image width, with a thick white border, a wider white strip at the bottom, slightly curled corners. The photo's picture area inside the white border is filled with flat, solid, pure magenta color, perfectly uniform, no texture. A pencil and a coffee cup at the edges of the desk. Photorealistic photo, 35mm, sharp, no people, no text.",
+    "subject": "Image 1 is a photo of a person. Make a faded vintage 1970s instant photo of this exact person: head and shoulders, smiling at the camera, warm faded colours, soft film grain, the same face, hairstyle, skin tone and clothes as image 1, a plain light background.",
+    "grip": "Image 1 shows a vintage instant photo lying on a wooden desk; the photo shows a person. Image 2 is a photo of that person. Edit only the picture area of the photo in image 1: the person in the photo has come alive, leans toward the viewer with a delighted grin, and both of their hands now rest on the bottom edge of the picture area, inside the photo, fingertips curling over the inner edge of the picture onto the white border. They still look like a faded instant photo. The white border, the desk, the pencil and the cup do not change: the same light, the same camera.",
+    "out": "Image 1 shows a person. Image 2 shows a wooden desk with a vintage instant photo whose picture area is a blank, faded, cream-coloured print with nothing on it. Edit image 2: a small, real, three-dimensional version of the person from image 1, about as tall as the photo, has climbed out of the photo and now stands on the photo's thick white border at the bottom, both feet planted on it, casting a soft shadow, smiling up at the viewer. Exactly the person in image 1: the same face, skin tone, hairstyle and clothes, in the same colours. The picture area behind them stays a blank, faded print. The same desk, the same pencil and cup, the same light, the same camera.",
+    "shot1": "The person in the vintage instant photo comes alive: they lean toward the viewer with a delighted grin and their hands come forward inside the picture and rest on its bottom edge, fingertips curling over onto the white border. The camera holds perfectly still. The desk and the photo stay still.",
+    "shot2": "The person climbs out of the instant photo: as they pull themselves out, the picture behind them fades to a blank, faded cream print, and they step out onto the photo's thick white border, a small, real person with both feet on it, casting a shadow, wearing the same clothes in the same colours. The camera pulls back smoothly. The desk and the photo stay still.",
+    "shot3": "The small person standing on the white border of the instant photo glances back at the blank picture behind them, then looks up at the camera, smiles and waves. The camera holds perfectly still: no zoom, no push-in. Nothing else enters the shot; the edges of the desk stay empty. The desk and the photo stay still.",
+    "family": "breakout",
+    "likeness": "Image 1 shows a person. Keep image 1 exactly: the same pose, clothes, background, light and framing. Only make the face match the face of the person in image 2 exactly: the same face shape, skin tone, eyes, nose, mouth, age and facial hair.",
+    "border": 24,
+    "below": 70,
+    "grip_edge": "bottom",
+    "out_from_empty": true,
+    "plate_seeds": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "hole_fill": [
+      226,
+      214,
+      190
+    ],
+    "identity_min": 0.3,
+    "painting_identity_min": 0.3,
+    "tags": [
+      "photo",
+      "miniature"
+    ]
+  },
+  "steps": [
+    {
+      "step": "plate",
+      "candidates": [
+        {
+          "seed": 1,
+          "score": 0.2246,
+          "hole": [
+            145,
+            370,
+            433,
+            478
+          ],
+          "coverage": 1.0
+        },
+        {
+          "seed": 2,
+          "score": 0.2177,
+          "hole": [
+            150,
+            352,
+            428,
+            495
+          ],
+          "coverage": 0.947
+        },
+        {
+          "seed": 3,
+          "score": 0.1737,
+          "hole": [
+            182,
+            371,
+            385,
+            440
+          ],
+          "coverage": 0.945
+        },
+        {
+          "seed": 4,
+          "score": 0.2068,
+          "hole": [
+            152,
+            351,
+            433,
+            452
+          ],
+          "coverage": 0.974
+        }
+      ],
+      "hole": [
+        145,
+        370,
+        433,
+        478
+      ]
+    },
+    {
+      "step": "preset",
+      "valid": true
+    },
+    {
+      "step": "preview",
+      "ok": true,
+      "gate_passed": true,
+      "attempts": 1,
+      "seconds": 271.1
+    }
+  ],
+  "published": true,
+  "seconds": 311.9
+}

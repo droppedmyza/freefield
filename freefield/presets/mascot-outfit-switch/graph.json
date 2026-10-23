@@ -1,0 +1,511 @@
+{
+  "photo": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": ""
+    },
+    "_meta": {
+      "title": "Your photo (preset input)"
+    }
+  },
+  "klein_model": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b-fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "FLUX.2 klein 4B (Apache-2.0)"
+    }
+  },
+  "klein_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3-4B text encoder"
+    }
+  },
+  "klein_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "keyframe_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Keyframe prompt (what the still should show)"
+    }
+  },
+  "keyframe_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "keyframe_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty negative (CFG 1)"
+    }
+  },
+  "photo_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "Reference 1: scale to ~1MP"
+    }
+  },
+  "photo_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "photo_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Reference 1: encode"
+    }
+  },
+  "photo_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "keyframe_prompt",
+        0
+      ],
+      "latent": [
+        "photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Attach reference 1 (positive)"
+    }
+  },
+  "photo_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "keyframe_negative",
+        0
+      ],
+      "latent": [
+        "photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Attach reference 1 (negative)"
+    }
+  },
+  "keyframe_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "photo_ref_pos",
+        0
+      ],
+      "negative": [
+        "photo_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "keyframe_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Keyframe seed"
+    }
+  },
+  "keyframe_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Sampler"
+    }
+  },
+  "keyframe_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "4-step schedule"
+    }
+  },
+  "keyframe_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Keyframe canvas"
+    }
+  },
+  "keyframe_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "keyframe_noise",
+        0
+      ],
+      "guider": [
+        "keyframe_guider",
+        0
+      ],
+      "sampler": [
+        "keyframe_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "keyframe_sigmas",
+        0
+      ],
+      "latent_image": [
+        "keyframe_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Generate keyframe"
+    }
+  },
+  "keyframe": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "keyframe_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Keyframe image"
+    }
+  },
+  "keyframe_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "keyframe",
+        0
+      ],
+      "filename_prefix": "freefield/keyframe"
+    },
+    "_meta": {
+      "title": "Save keyframe (also used by the eval)"
+    }
+  },
+  "wan_model": {
+    "class_type": "UnetLoaderGGUF",
+    "inputs": {
+      "unet_name": "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"
+    },
+    "_meta": {
+      "title": "Wan 2.2 TI2V-5B Turbo Q6 (Apache-2.0)"
+    }
+  },
+  "wan_te": {
+    "class_type": "CLIPLoaderGGUF",
+    "inputs": {
+      "clip_name": "umt5-xxl-encoder-Q5_K_M.gguf",
+      "type": "wan"
+    },
+    "_meta": {
+      "title": "umt5-xxl text encoder (GGUF)"
+    }
+  },
+  "wan_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan2.2_vae.safetensors"
+    },
+    "_meta": {
+      "title": "Wan 2.2 VAE"
+    }
+  },
+  "motion_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "",
+      "clip": [
+        "wan_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Motion prompt (what happens in the clip)"
+    }
+  },
+  "motion_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "motion_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty negative (CFG 1)"
+    }
+  },
+  "video_latent": {
+    "class_type": "Wan22ImageToVideoLatent",
+    "inputs": {
+      "vae": [
+        "wan_vae",
+        0
+      ],
+      "width": 480,
+      "height": 832,
+      "length": 73,
+      "batch_size": 1,
+      "start_image": [
+        "keyframe",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Start the clip from the keyframe"
+    }
+  },
+  "wan_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan_model",
+        0
+      ],
+      "shift": 8.0
+    },
+    "_meta": {
+      "title": "Sampling shift"
+    }
+  },
+  "video_sample": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "wan_shift",
+        0
+      ],
+      "seed": 42,
+      "steps": 4,
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "positive": [
+        "motion_prompt",
+        0
+      ],
+      "negative": [
+        "motion_negative",
+        0
+      ],
+      "latent_image": [
+        "video_latent",
+        0
+      ],
+      "denoise": 1.0
+    },
+    "_meta": {
+      "title": "Animate (4 steps)"
+    }
+  },
+  "video_frames": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "video_sample",
+        0
+      ],
+      "vae": [
+        "wan_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Decode frames"
+    }
+  },
+  "before": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 480,
+      "height": 832,
+      "crop": "center"
+    },
+    "_meta": {
+      "title": "Your photo at clip size"
+    }
+  },
+  "before_frames": {
+    "class_type": "RepeatImageBatch",
+    "inputs": {
+      "image": [
+        "before",
+        0
+      ],
+      "amount": 73
+    },
+    "_meta": {
+      "title": "Your photo for every frame"
+    }
+  },
+  "wipe": {
+    "class_type": "LoadVideo",
+    "inputs": {
+      "file": ""
+    },
+    "_meta": {
+      "title": "Wipe mask (preset asset, made by the builder)"
+    }
+  },
+  "wipe_parts": {
+    "class_type": "GetVideoComponents",
+    "inputs": {
+      "video": [
+        "wipe",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Wipe mask frames"
+    }
+  },
+  "wipe_mask": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "wipe_parts",
+        0
+      ],
+      "channel": "red"
+    },
+    "_meta": {
+      "title": "Wipe mask as a mask"
+    }
+  },
+  "reveal": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "before_frames",
+        0
+      ],
+      "source": [
+        "video_frames",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "wipe_mask",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Reveal: wipe from your photo into the effect"
+    }
+  },
+  "watermark": {
+    "class_type": "TextOverlay",
+    "inputs": {
+      "images": [
+        "reveal",
+        0
+      ],
+      "text": "FreeField \u00b7 open source",
+      "font_size": 2.5,
+      "color": "#ffffff",
+      "position": "top",
+      "align": "right",
+      "outline": true
+    },
+    "_meta": {
+      "title": "Watermark (made with FreeField)"
+    }
+  },
+  "video": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": [
+        "watermark",
+        0
+      ],
+      "fps": 24.0
+    },
+    "_meta": {
+      "title": "Frames to video"
+    }
+  },
+  "clip_save": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": [
+        "video",
+        0
+      ],
+      "filename_prefix": "freefield/clip",
+      "format": "mp4",
+      "format.codec": "h264"
+    },
+    "_meta": {
+      "title": "Save clip (the result)"
+    }
+  }
+}

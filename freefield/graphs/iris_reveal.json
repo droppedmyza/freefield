@@ -1,0 +1,23 @@
+{
+  "photo": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": ""
+    },
+    "_meta": {
+      "title": "Your selfie (full resolution; the zoom uses only these pixels)"
+    }
+  },
+  "photo_preview": {
+    "class_type": "PreviewImage",
+    "inputs": {
+      "images": [
+        "photo",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Your selfie as given"
+    }
+  }
+}

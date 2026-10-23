@@ -1,0 +1,22 @@
+{
+  "id": "action-figure",
+  "name": "Action Figure",
+  "family": "toy",
+  "description": "You as a limited-edition action figure, sealed in a blister-pack box on a toy store shelf, with a slow product-reveal push-in.",
+  "graph": "selfie_header_clip.json",
+  "inputs": {
+    "photo": {"type": "image", "label": "A clear photo of your face", "bind": ["photo.image"]}
+  },
+  "params": {
+    "seed": {"type": "int", "default": 42, "min": 0, "max": 2147483647, "bind": ["keyframe_noise.noise_seed", "video_sample.seed"]}
+  },
+  "fixed": {
+    "header.image": "asset:header.png",
+    "keyframe_prompt.text": "Turn the person from image 1 into a collectible plastic action figure sealed in a toy blister-pack box on a toy store shelf. The box fills most of the frame and its top is cut off by the top edge of the frame. Inside the clear plastic blister the figure is big, standing from just below the top edge of the frame down to the bottom of the box, its face large and clearly visible. The figure has the same face, hairstyle, skin tone and outfit as the person in image 1, with a slightly glossy plastic finish. Solid royal-blue backing card with a thin yellow border, flat solid colors, no printing. Sunglasses and a coffee cup in the tray by its feet. A strip of blurred, colorful toy store shelves is visible at the left and right edges and under the box. Product photo, glossy reflections on the plastic, sharp focus on the face, vivid colors.",
+    "motion_prompt.text": "Slow cinematic push-in toward the action figure box hanging on the toy store shelf. Light glints slide across the clear plastic window, the figure inside stays perfectly still, shallow depth of field, smooth camera move."
+  },
+  "outputs": ["clip_save", "keyframe_save"],
+  "models": ["flux-2-klein-4b-fp8.safetensors", "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"],
+  "license": "apache-2.0 weights",
+  "tags": ["toy", "product-reveal"]
+}

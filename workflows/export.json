@@ -1,0 +1,117 @@
+[
+  {
+    "preset": "out-of-the-frame",
+    "name": "Out of the Frame",
+    "pipeline": null,
+    "nodes": 132,
+    "assets": [
+      "out-of-the-frame--painting_noface.jpg",
+      "out-of-the-frame--plate.png",
+      "out-of-the-frame--plate_hole.png",
+      "out-of-the-frame--wall_mask.png"
+    ],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "out-of-the-photo",
+    "name": "Out of the Photo",
+    "pipeline": null,
+    "nodes": 132,
+    "assets": [
+      "out-of-the-photo--plate.png",
+      "out-of-the-photo--plate_hole.png",
+      "out-of-the-photo--wall_mask.png"
+    ],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "earth-zoom",
+    "name": "Earth Zoom Into My Clip",
+    "pipeline": "earth_zoom",
+    "nodes": 49,
+    "assets": [],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "product-freeze",
+    "name": "Product Freeze Ad",
+    "pipeline": "product_freeze",
+    "nodes": 18,
+    "assets": [],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "comic-bonk",
+    "name": "Comic Bonk",
+    "pipeline": "comic_bonk",
+    "nodes": 22,
+    "assets": [],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "raven-poof",
+    "name": "Raven Poof",
+    "pipeline": null,
+    "nodes": 14,
+    "assets": [],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "raven-intro",
+    "name": "Raven Poof Intro",
+    "pipeline": "raven_intro",
+    "nodes": 14,
+    "assets": [],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "toy-hug-studio",
+    "name": "Toy Hug",
+    "pipeline": null,
+    "nodes": 19,
+    "assets": [],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "mascot-outfit-switch",
+    "name": "Mascot Outfit Switch",
+    "pipeline": null,
+    "nodes": 36,
+    "assets": [
+      "mascot-outfit-switch--mascot-outfit-switch-wipe.mp4"
+    ],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "paper-me",
+    "name": "Paper Me",
+    "pipeline": null,
+    "nodes": 39,
+    "assets": [
+      "paper-me--paper-me-wipe.mp4",
+      "paper-me--paper-me-header.png"
+    ],
+    "ui_export": true,
+    "error": null
+  },
+  {
+    "preset": "pet-to-human-studio",
+    "name": "Pet to Human",
+    "pipeline": null,
+    "nodes": 43,
+    "assets": [
+      "pet-to-human-studio--pet-to-human-studio-wipe.mp4"
+    ],
+    "ui_export": true,
+    "error": null
+  }
+]

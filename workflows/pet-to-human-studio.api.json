@@ -1,0 +1,640 @@
+{
+  "photo": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "your_photo.png"
+    },
+    "_meta": {
+      "title": "Your photo (preset input)"
+    }
+  },
+  "photo_tiny": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "area",
+      "width": 36,
+      "height": 64,
+      "crop": "center"
+    },
+    "_meta": {
+      "title": "Your photo shrunk to a colour guide (no animal features survive)"
+    }
+  },
+  "photo_blur": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "photo_tiny",
+        0
+      ],
+      "upscale_method": "bilinear",
+      "width": 720,
+      "height": 1280,
+      "crop": "disabled"
+    },
+    "_meta": {
+      "title": "Colour guide at full size"
+    }
+  },
+  "klein_model": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b-fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "FLUX.2 klein 4B (Apache-2.0)"
+    }
+  },
+  "klein_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3-4B text encoder"
+    }
+  },
+  "klein_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "keyframe_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Image 1 is a blurred colour guide made from a photo of a pet. Make a portrait photo of an invented human character with the same colors and personality: an invented adult whose hair colour echoes the main colours of image 1 and whose clothes echo its other colours, in a similar setting and light. A fully human face with human ears, a human nose and smooth bare human skin. A natural friendly expression. An ordinary invented person with an original face. A head-and-shoulders portrait of one person alone. Photorealistic, vertical portrait framing, high detail, a clean unmarked photo.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Keyframe prompt (what the still should show)"
+    }
+  },
+  "keyframe_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "keyframe_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty negative (CFG 1)"
+    }
+  },
+  "photo_blur_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "photo_blur",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "Reference 1: scale to ~1MP"
+    }
+  },
+  "photo_blur_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "photo_blur_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Reference 1: encode"
+    }
+  },
+  "photo_blur_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "keyframe_prompt",
+        0
+      ],
+      "latent": [
+        "photo_blur_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Attach reference 1 (positive)"
+    }
+  },
+  "photo_blur_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "keyframe_negative",
+        0
+      ],
+      "latent": [
+        "photo_blur_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Attach reference 1 (negative)"
+    }
+  },
+  "keyframe_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "photo_blur_ref_pos",
+        0
+      ],
+      "negative": [
+        "photo_blur_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "keyframe_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Keyframe seed"
+    }
+  },
+  "keyframe_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Sampler"
+    }
+  },
+  "keyframe_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "4-step schedule"
+    }
+  },
+  "keyframe_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Keyframe canvas"
+    }
+  },
+  "keyframe_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "keyframe_noise",
+        0
+      ],
+      "guider": [
+        "keyframe_guider",
+        0
+      ],
+      "sampler": [
+        "keyframe_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "keyframe_sigmas",
+        0
+      ],
+      "latent_image": [
+        "keyframe_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Generate keyframe"
+    }
+  },
+  "keyframe": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "keyframe_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Keyframe image"
+    }
+  },
+  "keyframe_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "keyframe",
+        0
+      ],
+      "filename_prefix": "freefield/keyframe"
+    },
+    "_meta": {
+      "title": "Save keyframe (also used by the eval)"
+    }
+  },
+  "wan14_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "umt5-xxl text encoder (fp8)"
+    }
+  },
+  "wan14_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    },
+    "_meta": {
+      "title": "Wan 2.1 VAE (used by the 14B models)"
+    }
+  },
+  "wan14_high": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Wan 2.2 I2V-A14B high-noise expert (fp8)"
+    }
+  },
+  "wan14_high_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "wan14_high",
+        0
+      ],
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "lightx2v 4-step LoRA (high noise)"
+    }
+  },
+  "wan14_high_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan14_high_lora",
+        0
+      ],
+      "shift": 5.0
+    },
+    "_meta": {
+      "title": "Sampling shift (high)"
+    }
+  },
+  "wan14_low": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Wan 2.2 I2V-A14B low-noise expert (fp8)"
+    }
+  },
+  "wan14_low_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "wan14_low",
+        0
+      ],
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "lightx2v 4-step LoRA (low noise)"
+    }
+  },
+  "wan14_low_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan14_low_lora",
+        0
+      ],
+      "shift": 5.0
+    },
+    "_meta": {
+      "title": "Sampling shift (low)"
+    }
+  },
+  "motion_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "They look at the camera and grin. Smooth, natural motion; the subject stays recognisable. This one person is alone in the picture, seen from the shoulders up. Only the face moves; the shoulders stay still. Static shot: the camera holds steady and the background stays still.",
+      "clip": [
+        "wan14_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Animate: motion prompt"
+    }
+  },
+  "motion_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "motion_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty negative (CFG 1)"
+    }
+  },
+  "motion_latent": {
+    "class_type": "WanImageToVideo",
+    "inputs": {
+      "positive": [
+        "motion_prompt",
+        0
+      ],
+      "negative": [
+        "motion_negative",
+        0
+      ],
+      "vae": [
+        "wan14_vae",
+        0
+      ],
+      "width": 480,
+      "height": 832,
+      "length": 73,
+      "batch_size": 1,
+      "start_image": [
+        "keyframe",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Animate: pin the first frame"
+    }
+  },
+  "motion_sample_high": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "wan14_high_shift",
+        0
+      ],
+      "latent_image": [
+        "motion_latent",
+        2
+      ],
+      "add_noise": "enable",
+      "start_at_step": 0,
+      "end_at_step": 2,
+      "return_with_leftover_noise": "enable",
+      "positive": [
+        "motion_latent",
+        0
+      ],
+      "negative": [
+        "motion_latent",
+        1
+      ],
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "steps": 4,
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Animate: motion layout, steps 0-2 (high-noise expert)"
+    }
+  },
+  "motion_sample": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "wan14_low_shift",
+        0
+      ],
+      "latent_image": [
+        "motion_sample_high",
+        0
+      ],
+      "add_noise": "disable",
+      "start_at_step": 2,
+      "end_at_step": 10000,
+      "return_with_leftover_noise": "disable",
+      "positive": [
+        "motion_latent",
+        0
+      ],
+      "negative": [
+        "motion_latent",
+        1
+      ],
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "steps": 4,
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Animate: detail, steps 2-4 (low-noise expert)"
+    }
+  },
+  "motion_frames": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "motion_sample",
+        0
+      ],
+      "vae": [
+        "wan14_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Animate: decode frames"
+    }
+  },
+  "before": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 480,
+      "height": 832,
+      "crop": "center"
+    },
+    "_meta": {
+      "title": "Your photo at clip size"
+    }
+  },
+  "before_frames": {
+    "class_type": "RepeatImageBatch",
+    "inputs": {
+      "image": [
+        "before",
+        0
+      ],
+      "amount": 73
+    },
+    "_meta": {
+      "title": "Your photo for every frame"
+    }
+  },
+  "wipe": {
+    "class_type": "LoadVideo",
+    "inputs": {
+      "file": "pet-to-human-studio--pet-to-human-studio-wipe.mp4"
+    },
+    "_meta": {
+      "title": "Wipe mask (preset asset, made by the builder)"
+    }
+  },
+  "wipe_parts": {
+    "class_type": "GetVideoComponents",
+    "inputs": {
+      "video": [
+        "wipe",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Wipe mask frames"
+    }
+  },
+  "wipe_mask": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "wipe_parts",
+        0
+      ],
+      "channel": "red"
+    },
+    "_meta": {
+      "title": "Wipe mask as a mask"
+    }
+  },
+  "reveal": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "before_frames",
+        0
+      ],
+      "source": [
+        "motion_frames",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "wipe_mask",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Reveal: wipe from your photo into the effect"
+    }
+  },
+  "watermark": {
+    "class_type": "TextOverlay",
+    "inputs": {
+      "images": [
+        "reveal",
+        0
+      ],
+      "text": "FreeField \u00b7 open source",
+      "font_size": 2.5,
+      "color": "#ffffff",
+      "position": "top",
+      "align": "right",
+      "outline": true
+    },
+    "_meta": {
+      "title": "Watermark (made with FreeField)"
+    }
+  },
+  "video": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": [
+        "watermark",
+        0
+      ],
+      "fps": 24.0
+    },
+    "_meta": {
+      "title": "Frames to video"
+    }
+  },
+  "clip_save": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": [
+        "video",
+        0
+      ],
+      "filename_prefix": "freefield/clip",
+      "format": "mp4",
+      "format.codec": "h264"
+    },
+    "_meta": {
+      "title": "Save clip (the result)"
+    }
+  }
+}

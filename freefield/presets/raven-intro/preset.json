@@ -1,0 +1,56 @@
+{
+  "id": "raven-intro",
+  "name": "Raven Poof Intro",
+  "family": "toy",
+  "pipeline": "raven_intro",
+  "description": "An intro for your video: your figurine or object bursts into a flock of ravens that fly off, then your title appears over the empty shelf. The clip is matched to your photo's exposure, with a whoosh on the burst. 9:16.",
+  "graph": "graph.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A photo of a figurine or object on a shelf or table",
+      "bind": [
+        "photo.image"
+      ]
+    },
+    "title": {
+      "type": "text",
+      "label": "Title (e.g. your channel name)",
+      "required": false,
+      "max_length": 40,
+      "bind": [
+        "pipeline:title"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 21,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "video_sample.seed"
+      ]
+    }
+  },
+  "outputs": [
+    "clip_save"
+  ],
+  "models": [
+    "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf",
+    "umt5-xxl-encoder-Q5_K_M.gguf",
+    "wan2.2_vae.safetensors"
+  ],
+  "license": "Apache-2.0 weights (Wan 2.2 TI2V-5B); exposure match, title and whoosh by FreeField",
+  "preview": "preview.mp4",
+  "tags": [
+    "toy",
+    "intro",
+    "9:16",
+    "8gb-profile"
+  ],
+  "fixed": {
+    "motion_prompt.text": "In a sudden burst it becomes a flock of black ravens that fly up and out of the frame, and only the empty shelf remains. Smooth, natural motion. Static shot: the camera holds steady and the background stays still."
+  }
+}

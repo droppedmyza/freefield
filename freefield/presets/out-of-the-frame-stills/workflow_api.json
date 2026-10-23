@@ -1,0 +1,1317 @@
+{
+  "photo": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "your_photo.png"
+    },
+    "_meta": {
+      "title": "Your photo (preset input)"
+    }
+  },
+  "artwork_ref": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "painting_noface.jpg"
+    },
+    "_meta": {
+      "title": "Artwork with the face blanked (keyframe reference)"
+    }
+  },
+  "plate": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "plate.png"
+    },
+    "_meta": {
+      "title": "Gallery wall with an empty frame (preset asset)"
+    }
+  },
+  "plate_hole": {
+    "class_type": "LoadImageMask",
+    "inputs": {
+      "image": "plate_hole.png",
+      "channel": "red"
+    },
+    "_meta": {
+      "title": "Frame opening mask, cropped to the opening (preset asset)"
+    }
+  },
+  "wall": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "wall_mask.png"
+    },
+    "_meta": {
+      "title": "Lock mask: white = wall (and, for Out of the Frame, the gilt) the model may not touch (preset asset, make_plate.py)"
+    }
+  },
+  "wall_mask": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "wall",
+        0
+      ],
+      "channel": "red"
+    },
+    "_meta": {
+      "title": "Wall mask"
+    }
+  },
+  "frame_zone": {
+    "class_type": "InvertMask",
+    "inputs": {
+      "mask": [
+        "wall_mask",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Frame zone (opening, frame, rail)"
+    }
+  },
+  "klein_model": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b-fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "FLUX.2 klein 4B (Apache-2.0)"
+    }
+  },
+  "klein_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3-4B text encoder"
+    }
+  },
+  "klein_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "painting_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Image 1 is a photo of a person. Image 2 shows a pose and a costume. Make a photo of the exact person from image 1 in the pose and costume of image 2: looking back over the shoulder toward the viewer, wearing a blue and yellow turban wrapped over their hair, a large pearl earring and an ochre jacket with a white collar, plain dark background, soft light from the left. Photorealistic portrait photo. The same face, skin tone, age and features as image 1.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Keyframe prompt (what the still should show)"
+    }
+  },
+  "painting_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "painting_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Empty negative (CFG 1)"
+    }
+  },
+  "painting_photo_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Reference 1: scale to ~1MP"
+    }
+  },
+  "painting_photo_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "painting_photo_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Reference 1: encode"
+    }
+  },
+  "painting_photo_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "painting_prompt",
+        0
+      ],
+      "latent": [
+        "painting_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Attach reference 1 (positive)"
+    }
+  },
+  "painting_photo_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "painting_negative",
+        0
+      ],
+      "latent": [
+        "painting_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Attach reference 1 (negative)"
+    }
+  },
+  "painting_artwork_ref_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "artwork_ref",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Reference 2: scale to ~1MP"
+    }
+  },
+  "painting_artwork_ref_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "painting_artwork_ref_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Reference 2: encode"
+    }
+  },
+  "painting_artwork_ref_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "painting_photo_ref_pos",
+        0
+      ],
+      "latent": [
+        "painting_artwork_ref_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Attach reference 2 (positive)"
+    }
+  },
+  "painting_artwork_ref_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "painting_photo_ref_neg",
+        0
+      ],
+      "latent": [
+        "painting_artwork_ref_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Attach reference 2 (negative)"
+    }
+  },
+  "painting_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "painting_artwork_ref_ref_pos",
+        0
+      ],
+      "negative": [
+        "painting_artwork_ref_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "painting_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Keyframe seed"
+    }
+  },
+  "painting_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Sampler"
+    }
+  },
+  "painting_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 432,
+      "height": 656
+    },
+    "_meta": {
+      "title": "1a. Costume photo: 4-step schedule"
+    }
+  },
+  "painting_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 432,
+      "height": 656,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Keyframe canvas"
+    }
+  },
+  "painting_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "painting_noise",
+        0
+      ],
+      "guider": [
+        "painting_guider",
+        0
+      ],
+      "sampler": [
+        "painting_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "painting_sigmas",
+        0
+      ],
+      "latent_image": [
+        "painting_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Generate keyframe"
+    }
+  },
+  "painting": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "painting_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Keyframe image"
+    }
+  },
+  "painting_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "painting",
+        0
+      ],
+      "filename_prefix": "freefield/painting"
+    },
+    "_meta": {
+      "title": "1a. Costume photo: Save keyframe (also used by the eval)"
+    }
+  },
+  "likeness_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Image 1 is a portrait photo. Repaint image 1 as an oil painting on canvas with visible brushstrokes and fine craquelure, in the Dutch Golden Age style. Change only the medium: keep the same person, the same face, the same skin tone, the same pose, the same clothes, the same light and the same composition. The face must look exactly like the person in image 2.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Keyframe prompt (what the still should show)"
+    }
+  },
+  "likeness_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "likeness_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Empty negative (CFG 1)"
+    }
+  },
+  "likeness_painting_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "painting",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Reference 1: scale to ~1MP"
+    }
+  },
+  "likeness_painting_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "likeness_painting_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Reference 1: encode"
+    }
+  },
+  "likeness_painting_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "likeness_prompt",
+        0
+      ],
+      "latent": [
+        "likeness_painting_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Attach reference 1 (positive)"
+    }
+  },
+  "likeness_painting_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "likeness_negative",
+        0
+      ],
+      "latent": [
+        "likeness_painting_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Attach reference 1 (negative)"
+    }
+  },
+  "likeness_photo_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Reference 2: scale to ~1MP"
+    }
+  },
+  "likeness_photo_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "likeness_photo_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Reference 2: encode"
+    }
+  },
+  "likeness_photo_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "likeness_painting_ref_pos",
+        0
+      ],
+      "latent": [
+        "likeness_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Attach reference 2 (positive)"
+    }
+  },
+  "likeness_photo_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "likeness_painting_ref_neg",
+        0
+      ],
+      "latent": [
+        "likeness_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Attach reference 2 (negative)"
+    }
+  },
+  "likeness_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "likeness_photo_ref_pos",
+        0
+      ],
+      "negative": [
+        "likeness_photo_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "likeness_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Keyframe seed"
+    }
+  },
+  "likeness_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Sampler"
+    }
+  },
+  "likeness_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 432,
+      "height": 656
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: 4-step schedule"
+    }
+  },
+  "likeness_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 432,
+      "height": 656,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Keyframe canvas"
+    }
+  },
+  "likeness_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "likeness_noise",
+        0
+      ],
+      "guider": [
+        "likeness_guider",
+        0
+      ],
+      "sampler": [
+        "likeness_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "likeness_sigmas",
+        0
+      ],
+      "latent_image": [
+        "likeness_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Generate keyframe"
+    }
+  },
+  "likeness": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "likeness_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Keyframe image"
+    }
+  },
+  "likeness_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "likeness",
+        0
+      ],
+      "filename_prefix": "freefield/likeness"
+    },
+    "_meta": {
+      "title": "1b. Repaint in oil: Save keyframe (also used by the eval)"
+    }
+  },
+  "painting_fit": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "likeness",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 300,
+      "height": 455,
+      "crop": "center"
+    },
+    "_meta": {
+      "title": "2. START: fit the painting to the frame opening"
+    }
+  },
+  "start_frame": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "plate",
+        0
+      ],
+      "source": [
+        "painting_fit",
+        0
+      ],
+      "x": 210,
+      "y": 347,
+      "resize_source": false,
+      "mask": [
+        "plate_hole",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "2. START: hang the painting in the frame"
+    }
+  },
+  "start_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "start_frame",
+        0
+      ],
+      "filename_prefix": "freefield/start"
+    },
+    "_meta": {
+      "title": "2. START: save"
+    }
+  },
+  "grip_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Image 1 shows an oil painting in a gold frame on a museum wall. Image 2 is a photo of the person in the painting. Edit only the inside of the painting in image 1: the painted person has come alive, turns to the viewer with a delighted grin and reaches forward, and both of their painted hands now rest on the bottom edge of the canvas, just inside the gold frame, fingertips curling over the inner lip of the frame. Their arms come from their own shoulders, inside the painting. Nothing outside the gold frame changes: the green wall around the frame stays empty, with no hands or arms on it. They are still an oil painting with visible brushstrokes, wearing exactly the same clothes as in image 1: the ochre jacket with the white collar, the blue and yellow turban and the pearl earring. Take only the face from image 2, not its clothes or pose.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Keyframe prompt (what the still should show)"
+    }
+  },
+  "grip_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "grip_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Empty negative (CFG 1)"
+    }
+  },
+  "grip_start_frame_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "start_frame",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Reference 1: encode at its own size"
+    }
+  },
+  "grip_start_frame_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "grip_prompt",
+        0
+      ],
+      "latent": [
+        "grip_start_frame_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Attach reference 1 (positive)"
+    }
+  },
+  "grip_start_frame_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "grip_negative",
+        0
+      ],
+      "latent": [
+        "grip_start_frame_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Attach reference 1 (negative)"
+    }
+  },
+  "grip_photo_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "3. GRIP: Reference 2: scale to ~1MP"
+    }
+  },
+  "grip_photo_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "grip_photo_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Reference 2: encode"
+    }
+  },
+  "grip_photo_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "grip_start_frame_ref_pos",
+        0
+      ],
+      "latent": [
+        "grip_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Attach reference 2 (positive)"
+    }
+  },
+  "grip_photo_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "grip_start_frame_ref_neg",
+        0
+      ],
+      "latent": [
+        "grip_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Attach reference 2 (negative)"
+    }
+  },
+  "grip_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "grip_photo_ref_pos",
+        0
+      ],
+      "negative": [
+        "grip_photo_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "3. GRIP: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "grip_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "3. GRIP: Keyframe seed"
+    }
+  },
+  "grip_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "3. GRIP: Sampler"
+    }
+  },
+  "grip_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "3. GRIP: 4-step schedule"
+    }
+  },
+  "grip_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "3. GRIP: Keyframe canvas"
+    }
+  },
+  "grip_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "grip_noise",
+        0
+      ],
+      "guider": [
+        "grip_guider",
+        0
+      ],
+      "sampler": [
+        "grip_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "grip_sigmas",
+        0
+      ],
+      "latent_image": [
+        "grip_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Generate keyframe"
+    }
+  },
+  "grip": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "grip_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: Keyframe image"
+    }
+  },
+  "grip_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "grip",
+        0
+      ],
+      "filename_prefix": "freefield/grip"
+    },
+    "_meta": {
+      "title": "3. GRIP: save (before the wall lock; the gate checks this one)"
+    }
+  },
+  "breakout_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Image 2 shows an oil painting in a gold frame on a museum wall. Image 1 is a photo of the person in the painting. Edit image 2: the person has come to life and is climbing out of the painting. Their whole upper body is out of the frame, in front of the gold frame and the green wall below it: one hand grips the bottom rail of the frame, they lean far forward out of the frame toward the viewer, the other arm reaching toward the camera, their face large and close to the camera with a big delighted smile. They are now a real, photorealistic person: exactly the person in image 1, with the same age, skin, facial hair, hairline and eyes as image 1. Real skin, real hair, real fabric, still wearing the blue and yellow turban, the pearl earring and the ochre jacket from the painting. Bright, soft, even front light with no shadows on the wall: the wall below the frame is evenly lit and clean. The empty dark painted background stays inside the frame behind them. Same wall, same frame in the same place, same camera.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Keyframe prompt (what the still should show)"
+    }
+  },
+  "breakout_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "breakout_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Empty negative (CFG 1)"
+    }
+  },
+  "breakout_photo_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "4. OUT: Reference 1: scale to ~1MP"
+    }
+  },
+  "breakout_photo_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "breakout_photo_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Reference 1: encode"
+    }
+  },
+  "breakout_photo_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "breakout_prompt",
+        0
+      ],
+      "latent": [
+        "breakout_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Attach reference 1 (positive)"
+    }
+  },
+  "breakout_photo_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "breakout_negative",
+        0
+      ],
+      "latent": [
+        "breakout_photo_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Attach reference 1 (negative)"
+    }
+  },
+  "breakout_start_frame_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "start_frame",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Reference 2: encode at its own size"
+    }
+  },
+  "breakout_start_frame_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "breakout_photo_ref_pos",
+        0
+      ],
+      "latent": [
+        "breakout_start_frame_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Attach reference 2 (positive)"
+    }
+  },
+  "breakout_start_frame_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "breakout_photo_ref_neg",
+        0
+      ],
+      "latent": [
+        "breakout_start_frame_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Attach reference 2 (negative)"
+    }
+  },
+  "breakout_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "breakout_start_frame_ref_pos",
+        0
+      ],
+      "negative": [
+        "breakout_start_frame_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "4. OUT: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "breakout_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "4. OUT: Keyframe seed"
+    }
+  },
+  "breakout_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "4. OUT: Sampler"
+    }
+  },
+  "breakout_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "4. OUT: 4-step schedule"
+    }
+  },
+  "breakout_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "4. OUT: Keyframe canvas"
+    }
+  },
+  "breakout_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "breakout_noise",
+        0
+      ],
+      "guider": [
+        "breakout_guider",
+        0
+      ],
+      "sampler": [
+        "breakout_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "breakout_sigmas",
+        0
+      ],
+      "latent_image": [
+        "breakout_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Generate keyframe"
+    }
+  },
+  "breakout": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "breakout_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "4. OUT: Keyframe image"
+    }
+  },
+  "breakout_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "breakout",
+        0
+      ],
+      "filename_prefix": "freefield/breakout"
+    },
+    "_meta": {
+      "title": "4. OUT: save"
+    }
+  },
+  "grip_locked": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "start_frame",
+        0
+      ],
+      "source": [
+        "grip",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "frame_zone",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "3. GRIP: keep only the frame zone, the wall stays START's"
+    }
+  },
+  "proof_1": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "photo",
+        0
+      ],
+      "image2": [
+        "likeness",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 8,
+      "spacing_color": "white"
+    },
+    "_meta": {
+      "title": "Proof strip: + painting"
+    }
+  },
+  "proof_2": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "proof_1",
+        0
+      ],
+      "image2": [
+        "start_frame",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 8,
+      "spacing_color": "white"
+    },
+    "_meta": {
+      "title": "Proof strip: + start"
+    }
+  },
+  "proof_3": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "proof_2",
+        0
+      ],
+      "image2": [
+        "grip_locked",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 8,
+      "spacing_color": "white"
+    },
+    "_meta": {
+      "title": "Proof strip: + grip"
+    }
+  },
+  "proof_4": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "proof_3",
+        0
+      ],
+      "image2": [
+        "breakout",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 8,
+      "spacing_color": "white"
+    },
+    "_meta": {
+      "title": "Proof strip: + out"
+    }
+  },
+  "proof_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "proof_4",
+        0
+      ],
+      "filename_prefix": "freefield/proof"
+    },
+    "_meta": {
+      "title": "Save the how-it-was-made strip"
+    }
+  }
+}

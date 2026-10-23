@@ -1,0 +1,257 @@
+{
+  "start": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": ""
+    },
+    "_meta": {
+      "title": "The painting on the wall, at shot size (made by freefield.clip_breakout)"
+    }
+  },
+  "wan14_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "umt5-xxl text encoder (fp8)"
+    }
+  },
+  "wan14_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    },
+    "_meta": {
+      "title": "Wan 2.1 VAE (used by the 14B models)"
+    }
+  },
+  "wan14_high": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Wan 2.2 I2V-A14B high-noise expert (fp8)"
+    }
+  },
+  "wan14_high_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "wan14_high",
+        0
+      ],
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "lightx2v 4-step LoRA (high noise)"
+    }
+  },
+  "wan14_high_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan14_high_lora",
+        0
+      ],
+      "shift": 5.0
+    },
+    "_meta": {
+      "title": "Sampling shift (high)"
+    }
+  },
+  "wan14_low": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Wan 2.2 I2V-A14B low-noise expert (fp8)"
+    }
+  },
+  "wan14_low_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "wan14_low",
+        0
+      ],
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "lightx2v 4-step LoRA (low noise)"
+    }
+  },
+  "wan14_low_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan14_low_lora",
+        0
+      ],
+      "shift": 5.0
+    },
+    "_meta": {
+      "title": "Sampling shift (low)"
+    }
+  },
+  "shot1_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "The oil painting in the gold frame comes alive: the painted person takes a deep breath, their eyes move and find the viewer, their eyebrows lift, they tilt their head and break into a big laugh, their shoulders rise and fall, then they settle back into the same pose and smile. Their hands stay out of view. They are still a painting, brushstrokes visible. The camera holds perfectly still. The wall and the frame stay still.",
+      "clip": [
+        "wan14_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Shot 1, the painting comes alive: motion prompt"
+    }
+  },
+  "shot1_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "shot1_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty negative (CFG 1)"
+    }
+  },
+  "shot1_latent": {
+    "class_type": "WanFirstLastFrameToVideo",
+    "inputs": {
+      "positive": [
+        "shot1_prompt",
+        0
+      ],
+      "negative": [
+        "shot1_negative",
+        0
+      ],
+      "end_image": [
+        "start",
+        0
+      ],
+      "vae": [
+        "wan14_vae",
+        0
+      ],
+      "width": 720,
+      "height": 1280,
+      "length": 41,
+      "batch_size": 1,
+      "start_image": [
+        "start",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Shot 1, the painting comes alive: pin the first and last frame"
+    }
+  },
+  "shot1_sample_high": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "wan14_high_shift",
+        0
+      ],
+      "latent_image": [
+        "shot1_latent",
+        2
+      ],
+      "add_noise": "enable",
+      "start_at_step": 0,
+      "end_at_step": 2,
+      "return_with_leftover_noise": "enable",
+      "positive": [
+        "shot1_latent",
+        0
+      ],
+      "negative": [
+        "shot1_latent",
+        1
+      ],
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "steps": 4,
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Shot 1, the painting comes alive: motion layout, steps 0-2 (high-noise expert)"
+    }
+  },
+  "shot1_sample": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "wan14_low_shift",
+        0
+      ],
+      "latent_image": [
+        "shot1_sample_high",
+        0
+      ],
+      "add_noise": "disable",
+      "start_at_step": 2,
+      "end_at_step": 10000,
+      "return_with_leftover_noise": "disable",
+      "positive": [
+        "shot1_latent",
+        0
+      ],
+      "negative": [
+        "shot1_latent",
+        1
+      ],
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "steps": 4,
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Shot 1, the painting comes alive: detail, steps 2-4 (low-noise expert)"
+    }
+  },
+  "shot1_frames": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "shot1_sample",
+        0
+      ],
+      "vae": [
+        "wan14_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Shot 1, the painting comes alive: decode frames"
+    }
+  },
+  "shot1_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "shot1_frames",
+        0
+      ],
+      "filename_prefix": "freefield/shot1"
+    },
+    "_meta": {
+      "title": "Save shot 1 frames (freefield locks the wall and checks them)"
+    }
+  }
+}

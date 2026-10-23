@@ -1,0 +1,23 @@
+[
+  {
+    "title": "1. Your product photo",
+    "color": "#335",
+    "match": [
+      "product"
+    ]
+  },
+  {
+    "title": "FLUX.2 klein 4B",
+    "color": "#353",
+    "match": [
+      "klein_"
+    ]
+  },
+  {
+    "title": "2. Freeze it mid-splash",
+    "color": "#533",
+    "match": [
+      "freeze"
+    ]
+  }
+]

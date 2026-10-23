@@ -1,0 +1,109 @@
+[
+ {
+  "title": "Inputs and preset assets",
+  "color": "#444",
+  "match": [
+   "artwork_ref",
+   "frame_zone",
+   "photo",
+   "plate",
+   "plate_hole",
+   "wall",
+   "wall_mask"
+  ]
+ },
+ {
+  "title": "FLUX.2 klein 4B (all stills)",
+  "color": "#444",
+  "match": [
+   "klein_"
+  ]
+ },
+ {
+  "title": "1a. You, photographed in the costume",
+  "color": "#2a4858",
+  "match": [
+   "painting_",
+   "painting"
+  ]
+ },
+ {
+  "title": "1b. Repaint it in oil",
+  "color": "#2a4858",
+  "match": [
+   "likeness"
+  ]
+ },
+ {
+  "title": "2. START: hang it in the frame",
+  "color": "#2a5838",
+  "match": [
+   "painting_fit",
+   "start_frame",
+   "start_save"
+  ]
+ },
+ {
+  "title": "3. GRIP: painted hands on the rail",
+  "color": "#58482a",
+  "match": [
+   "grip",
+   "grip_locked"
+  ]
+ },
+ {
+  "title": "4. OUT: you, real, out of the frame",
+  "color": "#582a2a",
+  "match": [
+   "breakout"
+  ]
+ },
+ {
+  "title": "5. Camera path (crops of the keyframes)",
+  "color": "#3a2a58",
+  "match": [
+   "start_view",
+   "grip_view_crop",
+   "grip_view"
+  ]
+ },
+ {
+  "title": "Wan 2.2 I2V-A14B + lightx2v 4-step (studio profile)",
+  "color": "#444",
+  "match": [
+   "wan14_"
+  ]
+ },
+ {
+  "title": "6. Shot 1: the painting comes alive",
+  "color": "#2a4858",
+  "match": [
+   "shot1_"
+  ]
+ },
+ {
+  "title": "7. Shot 2: out of the frame",
+  "color": "#582a2a",
+  "match": [
+   "shot2_"
+  ]
+ },
+ {
+  "title": "8. Shot 3: the second beat",
+  "color": "#2a5838",
+  "match": [
+   "shot3_"
+  ]
+ },
+ {
+  "title": "9. Assemble, save, proof strip",
+  "color": "#444",
+  "match": [
+   "shots_",
+   "watermark",
+   "video",
+   "clip_save",
+   "proof_"
+  ]
+ }
+]

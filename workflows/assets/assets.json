@@ -1,0 +1,73 @@
+{
+  "out-of-the-frame": [
+    {
+      "file": "out-of-the-frame--painting_noface.jpg",
+      "sha256": "2235e6597131e22ac76049c6fb4e1628aa4d33ca478b68db6983d2d519149824",
+      "from": "freefield/presets/out-of-the-frame/painting_noface.jpg"
+    },
+    {
+      "file": "out-of-the-frame--plate.png",
+      "sha256": "355dd63ead78ec58247a75adfd5122516adab6d57676b962db10436314592346",
+      "from": "freefield/presets/out-of-the-frame/plate.png"
+    },
+    {
+      "file": "out-of-the-frame--plate_hole.png",
+      "sha256": "e9fa9dc31ceed6df3ee9d56231911770acc0dba8ff9bdaf4fd6cd72006e392cd",
+      "from": "freefield/presets/out-of-the-frame/plate_hole.png"
+    },
+    {
+      "file": "out-of-the-frame--wall_mask.png",
+      "sha256": "1bbf00a00d5a693540cc583c17425c13e67fdb2f862b63b5abf9289f3bf2fd5c",
+      "from": "freefield/presets/out-of-the-frame/wall_mask.png"
+    }
+  ],
+  "out-of-the-photo": [
+    {
+      "file": "out-of-the-photo--plate.png",
+      "sha256": "ed870abce9a89b6f318a24769e0d69551eb7c65b4bc48a4ccec751942b81fdbb",
+      "from": "freefield/presets/out-of-the-photo/plate.png"
+    },
+    {
+      "file": "out-of-the-photo--plate_hole.png",
+      "sha256": "34987a5cd5da34679f22c846df439f9383b10453676487a63f6a6e82d9858a37",
+      "from": "freefield/presets/out-of-the-photo/plate_hole.png"
+    },
+    {
+      "file": "out-of-the-photo--wall_mask.png",
+      "sha256": "a55f328e5b3a9f0876602131445dfa6cf322a1a40e3873a0c37681f6d71fb444",
+      "from": "freefield/presets/out-of-the-photo/wall_mask.png"
+    }
+  ],
+  "earth-zoom": [],
+  "product-freeze": [],
+  "comic-bonk": [],
+  "raven-poof": [],
+  "raven-intro": [],
+  "toy-hug-studio": [],
+  "mascot-outfit-switch": [
+    {
+      "file": "mascot-outfit-switch--mascot-outfit-switch-wipe.mp4",
+      "sha256": "fb4840da54054652329da34a7c88b2ed0a86518bba69147ccc7e9e81fa710c2d",
+      "from": "freefield/presets/mascot-outfit-switch/mascot-outfit-switch-wipe.mp4"
+    }
+  ],
+  "paper-me": [
+    {
+      "file": "paper-me--paper-me-wipe.mp4",
+      "sha256": "fb4840da54054652329da34a7c88b2ed0a86518bba69147ccc7e9e81fa710c2d",
+      "from": "freefield/presets/paper-me/paper-me-wipe.mp4"
+    },
+    {
+      "file": "paper-me--paper-me-header.png",
+      "sha256": "9c81cfe89b48f3f8e3417a236928c34c36456ac1ad5091ec9162b5c4d1f91180",
+      "from": "freefield/presets/paper-me/paper-me-header.png"
+    }
+  ],
+  "pet-to-human-studio": [
+    {
+      "file": "pet-to-human-studio--pet-to-human-studio-wipe.mp4",
+      "sha256": "fb4840da54054652329da34a7c88b2ed0a86518bba69147ccc7e9e81fa710c2d",
+      "from": "freefield/presets/_drafts/pet-to-human-studio/pet-to-human-studio-wipe.mp4"
+    }
+  ]
+}

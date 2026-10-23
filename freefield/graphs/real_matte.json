@@ -1,0 +1,73 @@
+{
+  "clip": {
+    "class_type": "LoadVideo",
+    "inputs": {
+      "file": ""
+    },
+    "_meta": {
+      "title": "Your selfie clip (normalised to 24 fps, 540x960 by freefield)"
+    }
+  },
+  "clip_frames": {
+    "class_type": "GetVideoComponents",
+    "inputs": {
+      "video": [
+        "clip",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Clip: frames, sound, frame rate"
+    }
+  },
+  "bg_model": {
+    "class_type": "LoadBackgroundRemovalModel",
+    "inputs": {
+      "bg_removal_name": "birefnet.safetensors"
+    },
+    "_meta": {
+      "title": "BiRefNet background removal (MIT)"
+    }
+  },
+  "matte": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "bg_model",
+        0
+      ],
+      "image": [
+        "clip_frames",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Matte every frame (you vs the room)"
+    }
+  },
+  "matte_image": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "matte",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Matte as images"
+    }
+  },
+  "matte_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "matte_image",
+        0
+      ],
+      "filename_prefix": "freefield/matte"
+    },
+    "_meta": {
+      "title": "Save the mattes (one PNG per frame)"
+    }
+  }
+}

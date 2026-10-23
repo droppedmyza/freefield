@@ -1,0 +1,109 @@
+{
+  "id": "out-of-the-frame",
+  "name": "Out of the Frame",
+  "family": "breakout",
+  "description": "You, painted Vermeer-style into a gold frame on a museum wall. Then the painting comes alive, grabs the frame and leans out of it, real, reaching for the camera.",
+  "graph": "selfie_breakout.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "painting_noise.noise_seed",
+        "likeness_noise.noise_seed",
+        "grip_noise.noise_seed",
+        "breakout_noise.noise_seed",
+        "shot1_sample_high.noise_seed",
+        "shot1_sample.noise_seed",
+        "shot2_sample_high.noise_seed",
+        "shot2_sample.noise_seed",
+        "shot3_sample_high.noise_seed",
+        "shot3_sample.noise_seed"
+      ]
+    }
+  },
+  "fixed": {
+    "artwork_ref.image": "asset:painting_noface.jpg",
+    "plate.image": "asset:plate.png",
+    "plate_hole.image": "asset:plate_hole.png",
+    "painting_prompt.text": "Image 1 is a photo of a person. Image 2 shows a pose and a costume. Make a photo of the exact person from image 1 in the pose and costume of image 2: looking back over the shoulder toward the viewer, wearing a blue and yellow turban wrapped over their hair, a large pearl earring and an ochre jacket with a white collar, plain dark background, soft light from the left. Photorealistic portrait photo. The same face, skin tone, age and features as image 1.",
+    "breakout_prompt.text": "Image 2 shows an oil painting in a gold frame on a museum wall. Image 1 is a photo of the person in the painting. Edit image 2: the person has come to life and is climbing out of the painting. Their whole upper body is out of the frame, in front of the gold frame and the green wall below it: their head, shoulders and chest are well out in front of the frame, one forearm resting on the bottom rail and the other hand reaching toward the camera with the elbow bent, the arm a natural length, their face large and close to the camera with a gentle smile. They are now a real, photorealistic person: exactly the person in image 1, with the same age, skin, facial hair, hairline and eyes as image 1. Real skin, real hair, real fabric, still wearing exactly the costume from the painting, now as real fabric: the blue and yellow turban, the pearl earring and a loose, collarless 17th-century ochre silk jacket with a wide, flat white linen collar and no lapels or buttons. Bright, soft, even front light with no shadows on the wall: the wall below the frame is evenly lit and clean. The empty dark painted background stays inside the frame behind them. Same wall, same frame in the same place, same camera.",
+    "grip_prompt.text": "Image 1 shows an oil painting in a gold frame on a museum wall. Image 2 is a photo of the person in the painting. Edit only the inside of the painting in image 1: the painted person has come alive, turns to the viewer with a warm smile and leans forward, and both of their painted hands now rest flat on the bottom of the canvas, inside the picture, just above the inner edge of the gold frame, their arms coming from their own shoulders. They are still an oil painting with visible brushstrokes, wearing exactly the same clothes as in image 1: the ochre jacket with the white collar, the blue and yellow turban and the pearl earring. The gold frame and the green wall are untouched. Take only the face from image 2, not its clothes or pose.",
+    "shot1_prompt.text": "The oil painting in the gold frame comes alive. The painted person slowly turns to face the viewer with a warm smile and leans a little forward. Their arms stay low and their painted hands slide up from below the bottom edge of the picture, attached to their arms, and come to rest flat on the bottom of the canvas. The hands stay low the whole time: no waving, the hands never rise above the chest. They are still a painting, brushstrokes visible. The camera holds perfectly still. The wall and the frame stay still.",
+    "shot2_prompt.text": "The person climbs out of the painting toward the camera: their painted skin and clothes turn into real skin and real fabric, still the blue and yellow turban, the pearl earring and the loose, collarless 17th-century ochre silk jacket with the wide, flat white linen collar, as they grab the bottom rail of the frame and their head, shoulders and chest come out in front of it, one forearm resting on the rail and the other hand reaching toward the camera with the elbow bent. The camera pulls back smoothly. The wall and the gold frame stay still.",
+    "shot3_prompt.text": "The person, leaning out of the gold frame in the loose, collarless 17th-century ochre silk jacket with the wide, flat white linen collar, glances back over their shoulder at the empty canvas behind them, then turns back to the camera, rests both forearms on the bottom rail of the frame and smiles warmly as the camera pushes in to a close-up of their face. The wall and the gold frame stay still.",
+    "likeness_prompt.text": "Image 1 is a portrait photo. Repaint image 1 as an oil painting on canvas with visible brushstrokes and fine craquelure, in the Dutch Golden Age style. Change only the medium: keep the same person, the same face, the same skin tone, the same pose, the same clothes, the same light and the same composition. The face must look exactly like the person in image 2.",
+    "painting_empty.width": 432,
+    "painting_empty.height": 656,
+    "painting_sigmas.width": 432,
+    "painting_sigmas.height": 656,
+    "likeness_empty.width": 432,
+    "likeness_empty.height": 656,
+    "likeness_sigmas.width": 432,
+    "likeness_sigmas.height": 656,
+    "painting_fit.width": 300,
+    "painting_fit.height": 455,
+    "start_frame.x": 210,
+    "start_frame.y": 347,
+    "start_view_crop.x": 110,
+    "start_view_crop.y": 118,
+    "start_view_crop.width": 500,
+    "start_view_crop.height": 889,
+    "grip_view_crop.x": 110,
+    "grip_view_crop.y": 118,
+    "grip_view_crop.width": 500,
+    "grip_view_crop.height": 889,
+    "wall.image": "asset:wall_mask.png",
+    "shot1_wall_crop.x": 110,
+    "shot1_wall_crop.y": 118,
+    "shot1_wall_crop.width": 500,
+    "shot1_wall_crop.height": 889
+  },
+  "outputs": [
+    "clip_save",
+    "start_save",
+    "grip_save",
+    "breakout_save",
+    "proof_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors"
+  ],
+  "license": "apache-2.0 weights; painting public domain (Wikimedia Commons); plate generated with FLUX.2 klein (no people)",
+  "credits": {
+    "painting_noface.jpg": "Johannes Vermeer, Girl with a Pearl Earring (1665), public domain, face blanked by scripts/blank_face.py (keyframe reference only)",
+    "plate.png": "museum wall and empty gold frame, evenly lit, generated with FLUX.2 [klein] 4B from a text prompt (scripts/make_plate.py)"
+  },
+  "tags": [
+    "painting",
+    "breakout",
+    "transformation",
+    "studio-profile"
+  ],
+  "gate": {
+    "hole": [
+      210,
+      347,
+      300,
+      455
+    ],
+    "rerolls": 8,
+    "frame_border": 78,
+    "facial_hair": true,
+    "shot1_corners": true,
+    "video_rerolls": 2
+  }
+}

@@ -1,0 +1,302 @@
+{
+  "photo": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": ""
+    },
+    "_meta": {
+      "title": "Your photo (preset input)"
+    }
+  },
+  "start": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "photo",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 720,
+      "height": 1280,
+      "crop": "center"
+    },
+    "_meta": {
+      "title": "Your photo, vertical (kept as it is)"
+    }
+  },
+  "wan14_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "umt5-xxl text encoder (fp8)"
+    }
+  },
+  "wan14_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    },
+    "_meta": {
+      "title": "Wan 2.1 VAE (used by the 14B models)"
+    }
+  },
+  "wan14_high": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Wan 2.2 I2V-A14B high-noise expert (fp8)"
+    }
+  },
+  "wan14_high_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "wan14_high",
+        0
+      ],
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "lightx2v 4-step LoRA (high noise)"
+    }
+  },
+  "wan14_high_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan14_high_lora",
+        0
+      ],
+      "shift": 5.0
+    },
+    "_meta": {
+      "title": "Sampling shift (high)"
+    }
+  },
+  "wan14_low": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Wan 2.2 I2V-A14B low-noise expert (fp8)"
+    }
+  },
+  "wan14_low_lora": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "wan14_low",
+        0
+      ],
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+      "strength_model": 1.0
+    },
+    "_meta": {
+      "title": "lightx2v 4-step LoRA (low noise)"
+    }
+  },
+  "wan14_low_shift": {
+    "class_type": "ModelSamplingSD3",
+    "inputs": {
+      "model": [
+        "wan14_low_lora",
+        0
+      ],
+      "shift": 5.0
+    },
+    "_meta": {
+      "title": "Sampling shift (low)"
+    }
+  },
+  "motion_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "",
+      "clip": [
+        "wan14_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Animate: motion prompt"
+    }
+  },
+  "motion_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "motion_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty negative (CFG 1)"
+    }
+  },
+  "motion_latent": {
+    "class_type": "WanImageToVideo",
+    "inputs": {
+      "positive": [
+        "motion_prompt",
+        0
+      ],
+      "negative": [
+        "motion_negative",
+        0
+      ],
+      "vae": [
+        "wan14_vae",
+        0
+      ],
+      "width": 480,
+      "height": 832,
+      "length": 73,
+      "batch_size": 1,
+      "start_image": [
+        "start",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Animate: pin the first frame"
+    }
+  },
+  "motion_sample_high": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "wan14_high_shift",
+        0
+      ],
+      "latent_image": [
+        "motion_latent",
+        2
+      ],
+      "add_noise": "enable",
+      "start_at_step": 0,
+      "end_at_step": 2,
+      "return_with_leftover_noise": "enable",
+      "positive": [
+        "motion_latent",
+        0
+      ],
+      "negative": [
+        "motion_latent",
+        1
+      ],
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "steps": 4,
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Animate: motion layout, steps 0-2 (high-noise expert)"
+    }
+  },
+  "motion_sample": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "model": [
+        "wan14_low_shift",
+        0
+      ],
+      "latent_image": [
+        "motion_sample_high",
+        0
+      ],
+      "add_noise": "disable",
+      "start_at_step": 2,
+      "end_at_step": 10000,
+      "return_with_leftover_noise": "disable",
+      "positive": [
+        "motion_latent",
+        0
+      ],
+      "negative": [
+        "motion_latent",
+        1
+      ],
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "steps": 4,
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Animate: detail, steps 2-4 (low-noise expert)"
+    }
+  },
+  "motion_frames": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "motion_sample",
+        0
+      ],
+      "vae": [
+        "wan14_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Animate: decode frames"
+    }
+  },
+  "watermark": {
+    "class_type": "TextOverlay",
+    "inputs": {
+      "images": [
+        "motion_frames",
+        0
+      ],
+      "text": "FreeField \u00b7 open source",
+      "font_size": 2.5,
+      "color": "#ffffff",
+      "position": "top",
+      "align": "right",
+      "outline": true
+    },
+    "_meta": {
+      "title": "Watermark (made with FreeField)"
+    }
+  },
+  "video": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "images": [
+        "watermark",
+        0
+      ],
+      "fps": 24.0
+    },
+    "_meta": {
+      "title": "Frames to video"
+    }
+  },
+  "clip_save": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "video": [
+        "video",
+        0
+      ],
+      "filename_prefix": "freefield/clip",
+      "format": "mp4",
+      "format.codec": "h264"
+    },
+    "_meta": {
+      "title": "Save clip (the result)"
+    }
+  }
+}

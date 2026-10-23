@@ -1,0 +1,53 @@
+{
+  "id": "monet-muse",
+  "name": "Monet Muse",
+  "family": "museum",
+  "description": "You, as the woman with the parasol in Monet's 1875 painting, breeze and all. The original sits underneath.",
+  "graph": "selfie_art_split.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "keyframe_noise.noise_seed",
+        "video_sample.seed"
+      ]
+    }
+  },
+  "fixed": {
+    "artwork.image": "asset:painting.jpg",
+    "artwork_ref.image": "asset:painting_noface.jpg",
+    "keyframe_prompt.text": "Image 2 is an impressionist painting whose face has been left blank. Paint the face and head of the person from image 1 into the blank area, so the painting shows that person as the figure holding a green parasol on a windy hilltop: white summer dress, a light veil fluttering, bright blue sky with white clouds, seen from slightly below, the face turned toward the viewer. Loose impressionist brushwork, Claude Monet, 1875. It must be the same person as image 1: same face, skin tone, age and gender.",
+    "motion_prompt.text": "An impressionist painting comes to life. A gentle breeze moves the dress and the veil, the person slowly turns their face toward the viewer and smiles, the parasol tilts slightly. White clouds drift slowly across a smooth blue sky. Static camera, soft daylight.",
+    "artwork_caption.text": "Monet, 1875"
+  },
+  "outputs": [
+    "clip_save",
+    "keyframe_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"
+  ],
+  "license": "apache-2.0 weights; painting CC0 / public domain (National Gallery of Art via Wikimedia Commons)",
+  "credits": {
+    "painting.jpg": "Claude Monet, Woman with a Parasol - Madame Monet and Her Son (1875), National Gallery of Art, CC0, https://commons.wikimedia.org/wiki/File:Claude_Monet,_Woman_with_a_Parasol_-_Madame_Monet_and_Her_Son,_1875,_NGA_61379.jpg (cropped to the woman and parasol)",
+    "painting_noface.jpg": "painting.jpg with the face blanked by scripts/blank_face.py (keyframe reference only)"
+  },
+  "tags": [
+    "painting",
+    "split-screen",
+    "art"
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "id": "out-of-the-box",
+  "name": "Out of the Box",
+  "family": "breakout",
+  "description": "You as a collectible action figure, sealed in a blister pack on a toy store shelf. Then the figure comes alive, smashes the plastic window and climbs out, hanging from the bottom of its empty box.",
+  "graph": "selfie_breakout.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image",
+        "artwork_ref.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "painting_noise.noise_seed",
+        "likeness_noise.noise_seed",
+        "grip_noise.noise_seed",
+        "breakout_noise.noise_seed",
+        "shot1_sample_high.noise_seed",
+        "shot1_sample.noise_seed",
+        "shot2_sample_high.noise_seed",
+        "shot2_sample.noise_seed",
+        "shot3_sample_high.noise_seed",
+        "shot3_sample.noise_seed"
+      ]
+    }
+  },
+  "fixed": {
+    "plate.image": "asset:plate.png",
+    "plate_hole.image": "asset:plate_hole.png",
+    "painting_empty.width": 400,
+    "painting_empty.height": 656,
+    "painting_sigmas.width": 400,
+    "painting_sigmas.height": 656,
+    "painting_fit.width": 372,
+    "painting_fit.height": 608,
+    "start_frame.x": 177,
+    "start_frame.y": 304,
+    "start_view_crop.x": 83,
+    "start_view_crop.y": 110,
+    "start_view_crop.width": 560,
+    "start_view_crop.height": 996,
+    "grip_view_crop.x": 83,
+    "grip_view_crop.y": 110,
+    "grip_view_crop.width": 560,
+    "grip_view_crop.height": 996,
+    "painting_prompt.text": "Image 1 is a photo of a person. Make a product photo of a collectible plastic action figure of this exact person: standing, full body from head to knees, facing the viewer with a confident smile, the same face, hairstyle, skin tone and outfit as image 1, with a slightly glossy molded-plastic finish. Plain solid royal-blue backing card behind the figure, flat even light. The face is large and clearly visible.",
+    "likeness_prompt.text": "Image 1 is a product photo of a plastic action figure. Keep image 1 exactly: the same pose, outfit, plastic finish, blue backing and framing. Only make the figure's face match the face of the person in image 2 more closely: the same face shape, skin tone, eyes, nose, mouth, age and facial hair, as a molded plastic toy face.",
+    "grip_prompt.text": "Image 1 shows a plastic action figure sealed in a red blister-pack box hanging in a toy store. Image 2 is a photo of the person the figure is modeled on. Edit only the inside of the box in image 1: the action figure has come alive, leans toward the viewer with a delighted grin and presses both plastic hands flat against the inside of the clear plastic window, which bulges slightly outward. It is still a glossy plastic action figure with the same face, hairstyle and outfit. Nothing outside the box changes: the same red box, the same shelves, the same light, the same camera.",
+    "breakout_prompt.text": "Image 1 is a collectible plastic action figure. Image 2 shows a toy store with an empty red blister-pack box hanging on a pegboard. Edit image 2: the action figure from image 1 has broken out of the box and is climbing down from it. The box's clear plastic window is smashed open and empty, with torn plastic shards around the hole. The figure hangs from the bottom edge of the red box by both plastic hands, its body in front of the box below it and its legs dangling, looking back at the camera with a big delighted smile. It is still a glossy plastic action figure, exactly the figure in image 1: the same face, hairstyle and outfit. The same box, the same shelves, the same light, the same camera.",
+    "shot1_prompt.text": "The plastic action figure inside the blister-pack box comes alive. It turns its head to the viewer with a delighted grin and presses both plastic hands against the inside of the clear plastic window, which bulges outward. The camera holds perfectly still. The box and the shelves stay still.",
+    "shot2_prompt.text": "The plastic action figure smashes through the clear plastic window: the plastic shatters and the figure climbs out of the box, swings its legs over the bottom edge and hangs from the bottom edge of the red box by both hands, its legs dangling. The camera pulls back smoothly. The box and the shelves stay still.",
+    "shot3_prompt.text": "The plastic action figure, hanging from the bottom edge of its smashed, empty box by both hands, looks back up at the empty box, then turns to the camera and laughs as the camera pushes in to a close-up of its delighted plastic face. The box and the shelves stay still.",
+    "likeness_empty.width": 400,
+    "likeness_empty.height": 656,
+    "likeness_sigmas.width": 400,
+    "likeness_sigmas.height": 656,
+    "wall.image": "asset:wall_mask.png",
+    "shot1_wall_crop.x": 83,
+    "shot1_wall_crop.y": 110,
+    "shot1_wall_crop.width": 560,
+    "shot1_wall_crop.height": 996,
+    "breakout_photo_scaled.image": [
+      "likeness",
+      0
+    ],
+    "breakout_start_frame_latent.pixels": [
+      "plate",
+      0
+    ]
+  },
+  "outputs": [
+    "clip_save",
+    "start_save",
+    "grip_save",
+    "breakout_save",
+    "proof_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors"
+  ],
+  "license": "apache-2.0 weights; plate generated with FLUX.2 klein (no people)",
+  "credits": {
+    "plate.png": "toy store, empty blister-pack box, generated with FLUX.2 [klein] 4B from a text prompt (scripts/make_plate.py)"
+  },
+  "tags": [
+    "toy",
+    "breakout",
+    "transformation",
+    "studio-profile"
+  ],
+  "gate": {
+    "hole": [
+      177,
+      304,
+      372,
+      608
+    ],
+    "rerolls": 8,
+    "identity_min": 0.2,
+    "painting_identity_min": 0.2
+  }
+}

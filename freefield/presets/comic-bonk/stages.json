@@ -1,0 +1,31 @@
+[
+  {
+    "title": "1. Your photo (a mascot, toy or cartoon)",
+    "color": "#335",
+    "match": [
+      "photo"
+    ]
+  },
+  {
+    "title": "2. Cut out the mascot (BiRefNet)",
+    "color": "#355",
+    "match": [
+      "bg_model",
+      "matte"
+    ]
+  },
+  {
+    "title": "FLUX.2 klein 4B",
+    "color": "#353",
+    "match": [
+      "klein_"
+    ]
+  },
+  {
+    "title": "3. Clear the background behind it (klein)",
+    "color": "#353",
+    "match": [
+      "plate"
+    ]
+  }
+]

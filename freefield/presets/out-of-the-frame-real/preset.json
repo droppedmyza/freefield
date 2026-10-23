@@ -1,0 +1,47 @@
+{
+  "id": "out-of-the-frame-real",
+  "name": "Out of the Frame: your clip",
+  "family": "breakout",
+  "pipeline": "clip_breakout",
+  "description": "You, painted in oils into a gold frame on a museum wall. The painting comes alive, the paint lifts off, and the real you leans out of the frame toward the camera: your own clip, not a generated one.",
+  "graph": "real_painting.json",
+  "inputs": {
+    "clip": {
+      "type": "video",
+      "label": "A 6-10 s selfie clip: phone propped about 2 m away, sit still a second, then lean in toward it",
+      "bind": [
+        "portrait_in.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 1,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "painting_noise.noise_seed",
+        "backdrop_noise.noise_seed"
+      ]
+    }
+  },
+  "outputs": [
+    "painting_save",
+    "backdrop_save"
+  ],
+  "models": [
+    "birefnet.safetensors",
+    "flux-2-klein-4b-fp8.safetensors",
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors"
+  ],
+  "license": "MIT/Apache-2.0 weights (BiRefNet MIT; klein, Wan, lightx2v Apache-2.0); plate generated with FLUX.2 klein (no people); the person is your own footage",
+  "tags": [
+    "painting",
+    "breakout",
+    "real-footage",
+    "studio-profile"
+  ],
+  "preview": "preview.mp4"
+}

@@ -1,0 +1,88 @@
+{
+  "id": "pet-to-human-studio",
+  "name": "Pet to Human",
+  "family": "built",
+  "description": "Your pet as an invented human character with the same colors and personality; then they look at the camera and grin. With a before/after reveal.",
+  "graph": "graph.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your pet",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "keyframe_noise.noise_seed",
+        "motion_sample_high.noise_seed",
+        "motion_sample.noise_seed"
+      ]
+    }
+  },
+  "fixed": {
+    "motion_prompt.text": "They look at the camera and grin. Smooth, natural motion; the subject stays recognisable. This one person is alone in the picture, seen from the shoulders up. Only the face moves; the shoulders stay still. Static shot: the camera holds steady and the background stays still.",
+    "keyframe_prompt.text": "Image 1 is a blurred colour guide made from a photo of a pet. Make a portrait photo of an invented human character with the same colors and personality: an invented adult whose hair colour echoes the main colours of image 1 and whose clothes echo its other colours, in a similar setting and light. A fully human face with human ears, a human nose and smooth bare human skin. A natural friendly expression. An ordinary invented person with an original face. A head-and-shoulders portrait of one person alone. Photorealistic, vertical portrait framing, high detail, a clean unmarked photo.",
+    "wipe.file": "asset:pet-to-human-studio-wipe.mp4"
+  },
+  "outputs": [
+    "clip_save",
+    "keyframe_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "qwen_3_4b_fp8_mixed.safetensors",
+    "flux2-vae.safetensors",
+    "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+    "wan_2.1_vae.safetensors",
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+    "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+    "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors"
+  ],
+  "license": "flux-2-klein-4b-fp8.safetensors apache-2.0; qwen_3_4b_fp8_mixed.safetensors apache-2.0; flux2-vae.safetensors apache-2.0; umt5_xxl_fp8_e4m3fn_scaled.safetensors apache-2.0; wan_2.1_vae.safetensors apache-2.0; wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors apache-2.0; wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors apache-2.0; wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors apache-2.0; wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors apache-2.0",
+  "source": {
+    "made_by": "FreeField effect builder v1",
+    "description": "my cat becomes an invented human character with the same colors and personality, then they look at the camera and grin, with a before/after reveal, named \"Pet to Human\"",
+    "recipe": {
+      "name": "Pet to Human",
+      "becomes": "an invented human character with the same colors and personality",
+      "motion": "they look at the camera and grin",
+      "reveal": true,
+      "split": false,
+      "title": null,
+      "reference": null,
+      "description": "my cat becomes an invented human character with the same colors and personality, then they look at the camera and grin, with a before/after reveal, named \"Pet to Human\"",
+      "subject": "pet",
+      "keep": false,
+      "caption": false,
+      "profile": "studio",
+      "id": "pet-to-human-studio",
+      "stages": [
+        "transform",
+        "animate",
+        "reveal",
+        "save"
+      ]
+    },
+    "created": "2026-10-18T11:40:26+00:00",
+    "revised": "2026-10-18: motion and keyframe prompts changed to positive-only wording; with the old prompts the person's hands came up to the face at seeds 42 and 7 (A5000); the shipped wording ('Only the face moves; the shoulders stay still') is clean at seeds 7, 11 and 42 on a 3090 and passes every check"
+  },
+  "credits": {
+    "pet-to-human-studio-wipe.mp4": "FreeField effect builder v1 (wipe mask) (generated)"
+  },
+  "asset_licenses": {
+    "pet-to-human-studio-wipe.mp4": "generated"
+  },
+  "tags": [
+    "built",
+    "reveal",
+    "studio-profile"
+  ]
+}

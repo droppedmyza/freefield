@@ -1,0 +1,76 @@
+{
+  "id": "toy-hug-studio",
+  "name": "Toy Hug",
+  "family": "built",
+  "description": "Your object, then the two plush toys turn to each other, lean together and hug.",
+  "graph": "graph.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of the object (a toy, a product, a mascot)",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "motion_sample_high.noise_seed",
+        "motion_sample.noise_seed"
+      ]
+    }
+  },
+  "fixed": {
+    "motion_prompt.text": "The two plush toys turn to each other, lean together and hug. Smooth, natural motion. Static shot: the camera holds steady and the background stays still."
+  },
+  "outputs": [
+    "clip_save"
+  ],
+  "models": [
+    "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+    "wan_2.1_vae.safetensors",
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+    "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+    "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors"
+  ],
+  "license": "umt5_xxl_fp8_e4m3fn_scaled.safetensors apache-2.0; wan_2.1_vae.safetensors apache-2.0; wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors apache-2.0; wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors apache-2.0; wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors apache-2.0; wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors apache-2.0",
+  "source": {
+    "made_by": "FreeField effect builder v1",
+    "description": "my two plush toys stay the same, then the two plush toys turn to each other, lean together and hug, named \"Toy Hug\"",
+    "recipe": {
+      "name": "Toy Hug",
+      "becomes": "",
+      "motion": "the two plush toys turn to each other, lean together and hug",
+      "reveal": false,
+      "split": false,
+      "title": null,
+      "reference": null,
+      "description": "my two plush toys stay the same, then the two plush toys turn to each other, lean together and hug, named \"Toy Hug\"",
+      "subject": "object",
+      "keep": true,
+      "caption": false,
+      "profile": "studio",
+      "id": "toy-hug-studio",
+      "stages": [
+        "animate",
+        "save"
+      ]
+    },
+    "created": "2026-10-18T08:15:32+00:00",
+    "approved": "2026-10-18T08:42:19+00:00",
+    "revised": "2026-10-18: motion prompt refreshed to the positive-only wording for a kept photo (no 'no tools, no hands, no objects'); seeds 42 and 7 on a 4090 still hug cleanly"
+  },
+  "credits": {},
+  "asset_licenses": {},
+  "tags": [
+    "built",
+    "studio-profile"
+  ],
+  "preview": "preview.mp4"
+}

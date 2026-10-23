@@ -1,0 +1,706 @@
+{
+  "frame0": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "your_photo.png"
+    },
+    "_meta": {
+      "title": "The first frame of your clip (or your photo), 720x1280"
+    }
+  },
+  "klein_model": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b-fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "FLUX.2 klein 4B (Apache-2.0)"
+    }
+  },
+  "klein_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3-4B text encoder"
+    }
+  },
+  "klein_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "drone_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Show this exact place from high above: a straight-down aerial drone photo of the same place, the same roofs, streets, trees, land and any water, seen from 400 meters up, natural daylight, photorealistic, no text.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Drone view: Keyframe prompt (what the still should show)"
+    }
+  },
+  "drone_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "drone_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Drone view: Empty negative (CFG 1)"
+    }
+  },
+  "drone_frame0_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "frame0",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "Drone view: Reference 1: scale to ~1MP"
+    }
+  },
+  "drone_frame0_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "drone_frame0_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Drone view: Reference 1: encode"
+    }
+  },
+  "drone_frame0_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "drone_prompt",
+        0
+      ],
+      "latent": [
+        "drone_frame0_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Drone view: Attach reference 1 (positive)"
+    }
+  },
+  "drone_frame0_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "drone_negative",
+        0
+      ],
+      "latent": [
+        "drone_frame0_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Drone view: Attach reference 1 (negative)"
+    }
+  },
+  "drone_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "drone_frame0_ref_pos",
+        0
+      ],
+      "negative": [
+        "drone_frame0_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Drone view: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "drone_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 7
+    },
+    "_meta": {
+      "title": "Drone view: Keyframe seed"
+    }
+  },
+  "drone_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Drone view: Sampler"
+    }
+  },
+  "drone_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "Drone view: 4-step schedule"
+    }
+  },
+  "drone_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Drone view: Keyframe canvas"
+    }
+  },
+  "drone_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "drone_noise",
+        0
+      ],
+      "guider": [
+        "drone_guider",
+        0
+      ],
+      "sampler": [
+        "drone_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "drone_sigmas",
+        0
+      ],
+      "latent_image": [
+        "drone_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Drone view: Generate keyframe"
+    }
+  },
+  "drone": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "drone_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Drone view: Keyframe image"
+    }
+  },
+  "drone_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "drone",
+        0
+      ],
+      "filename_prefix": "freefield/drone"
+    },
+    "_meta": {
+      "title": "Drone view: Save keyframe (also used by the eval)"
+    }
+  },
+  "gray": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1,
+      "color": 8421504
+    },
+    "_meta": {
+      "title": "Gray canvas (the zoomed-out view is painted around the drone view)"
+    }
+  },
+  "drone_small": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "drone",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 240,
+      "height": 427,
+      "crop": "disabled"
+    },
+    "_meta": {
+      "title": "Drone view at a third of the size"
+    }
+  },
+  "outpaint": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "gray",
+        0
+      ],
+      "source": [
+        "drone_small",
+        0
+      ],
+      "x": 240,
+      "y": 427,
+      "resize_source": false
+    },
+    "_meta": {
+      "title": "Drone view in the middle of the gray canvas"
+    }
+  },
+  "satellite_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Zoom out. The sharp picture in the middle is a small part of a wider straight-down satellite photo taken from much higher. Replace the flat gray border with the surrounding land, fields, hills and any coast or water, with scattered white clouds, continuing seamlessly from the middle picture. Keep the middle picture exactly as it is. Photorealistic satellite imagery, no text, no labels.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Satellite view: Keyframe prompt (what the still should show)"
+    }
+  },
+  "satellite_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "satellite_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Satellite view: Empty negative (CFG 1)"
+    }
+  },
+  "satellite_outpaint_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "outpaint",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "Satellite view: Reference 1: scale to ~1MP"
+    }
+  },
+  "satellite_outpaint_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "satellite_outpaint_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Satellite view: Reference 1: encode"
+    }
+  },
+  "satellite_outpaint_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "satellite_prompt",
+        0
+      ],
+      "latent": [
+        "satellite_outpaint_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Satellite view: Attach reference 1 (positive)"
+    }
+  },
+  "satellite_outpaint_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "satellite_negative",
+        0
+      ],
+      "latent": [
+        "satellite_outpaint_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Satellite view: Attach reference 1 (negative)"
+    }
+  },
+  "satellite_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "satellite_outpaint_ref_pos",
+        0
+      ],
+      "negative": [
+        "satellite_outpaint_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Satellite view: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "satellite_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 7
+    },
+    "_meta": {
+      "title": "Satellite view: Keyframe seed"
+    }
+  },
+  "satellite_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Satellite view: Sampler"
+    }
+  },
+  "satellite_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "Satellite view: 4-step schedule"
+    }
+  },
+  "satellite_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Satellite view: Keyframe canvas"
+    }
+  },
+  "satellite_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "satellite_noise",
+        0
+      ],
+      "guider": [
+        "satellite_guider",
+        0
+      ],
+      "sampler": [
+        "satellite_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "satellite_sigmas",
+        0
+      ],
+      "latent_image": [
+        "satellite_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Satellite view: Generate keyframe"
+    }
+  },
+  "satellite": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "satellite_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Satellite view: Keyframe image"
+    }
+  },
+  "satellite_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "satellite",
+        0
+      ],
+      "filename_prefix": "freefield/satellite"
+    },
+    "_meta": {
+      "title": "Satellite view: Save keyframe (also used by the eval)"
+    }
+  },
+  "globe_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "The whole planet Earth seen from space: a round blue globe with white clouds, oceans and continents, floating in black space with faint stars, centered in the frame. Photorealistic, no text.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Earth from space: Keyframe prompt (what the still should show)"
+    }
+  },
+  "globe_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "globe_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Earth from space: Empty negative (CFG 1)"
+    }
+  },
+  "globe_satellite_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "satellite",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "Earth from space: Reference 1: scale to ~1MP"
+    }
+  },
+  "globe_satellite_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "globe_satellite_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Earth from space: Reference 1: encode"
+    }
+  },
+  "globe_satellite_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "globe_prompt",
+        0
+      ],
+      "latent": [
+        "globe_satellite_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Earth from space: Attach reference 1 (positive)"
+    }
+  },
+  "globe_satellite_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "globe_negative",
+        0
+      ],
+      "latent": [
+        "globe_satellite_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Earth from space: Attach reference 1 (negative)"
+    }
+  },
+  "globe_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "globe_satellite_ref_pos",
+        0
+      ],
+      "negative": [
+        "globe_satellite_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Earth from space: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "globe_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 7
+    },
+    "_meta": {
+      "title": "Earth from space: Keyframe seed"
+    }
+  },
+  "globe_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Earth from space: Sampler"
+    }
+  },
+  "globe_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "Earth from space: 4-step schedule"
+    }
+  },
+  "globe_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Earth from space: Keyframe canvas"
+    }
+  },
+  "globe_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "globe_noise",
+        0
+      ],
+      "guider": [
+        "globe_guider",
+        0
+      ],
+      "sampler": [
+        "globe_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "globe_sigmas",
+        0
+      ],
+      "latent_image": [
+        "globe_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Earth from space: Generate keyframe"
+    }
+  },
+  "globe": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "globe_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Earth from space: Keyframe image"
+    }
+  },
+  "globe_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "globe",
+        0
+      ],
+      "filename_prefix": "freefield/globe"
+    },
+    "_meta": {
+      "title": "Earth from space: Save keyframe (also used by the eval)"
+    }
+  }
+}

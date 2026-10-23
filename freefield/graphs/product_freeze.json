@@ -1,0 +1,247 @@
+{
+  "product": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": ""
+    },
+    "_meta": {
+      "title": "Your product photo"
+    }
+  },
+  "klein_model": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b-fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "FLUX.2 klein 4B (Apache-2.0)"
+    }
+  },
+  "klein_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3-4B text encoder"
+    }
+  },
+  "klein_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "freeze_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Image 1 is a product photo. Make a premium advertising hero shot of the exact same product from image 1, unchanged in shape, colors, material, logo and details, frozen mid-air at the instant it splashes into water: a crown of clear water and droplets suspended around it, a clean bright studio backdrop, soft reflections, crisp high-speed photography. The product is the only subject in the picture, with calm empty space at the top of the frame.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Frozen splash: Keyframe prompt (what the still should show)"
+    }
+  },
+  "freeze_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "freeze_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Frozen splash: Empty negative (CFG 1)"
+    }
+  },
+  "freeze_product_scaled": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "product",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    },
+    "_meta": {
+      "title": "Frozen splash: Reference 1: scale to ~1MP"
+    }
+  },
+  "freeze_product_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "freeze_product_scaled",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Frozen splash: Reference 1: encode"
+    }
+  },
+  "freeze_product_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "freeze_prompt",
+        0
+      ],
+      "latent": [
+        "freeze_product_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Frozen splash: Attach reference 1 (positive)"
+    }
+  },
+  "freeze_product_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "freeze_negative",
+        0
+      ],
+      "latent": [
+        "freeze_product_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Frozen splash: Attach reference 1 (negative)"
+    }
+  },
+  "freeze_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "freeze_product_ref_pos",
+        0
+      ],
+      "negative": [
+        "freeze_product_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Frozen splash: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "freeze_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Frozen splash: Keyframe seed"
+    }
+  },
+  "freeze_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Frozen splash: Sampler"
+    }
+  },
+  "freeze_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 720,
+      "height": 1280
+    },
+    "_meta": {
+      "title": "Frozen splash: 4-step schedule"
+    }
+  },
+  "freeze_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 720,
+      "height": 1280,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Frozen splash: Keyframe canvas"
+    }
+  },
+  "freeze_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "freeze_noise",
+        0
+      ],
+      "guider": [
+        "freeze_guider",
+        0
+      ],
+      "sampler": [
+        "freeze_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "freeze_sigmas",
+        0
+      ],
+      "latent_image": [
+        "freeze_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Frozen splash: Generate keyframe"
+    }
+  },
+  "freeze": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "freeze_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Frozen splash: Keyframe image"
+    }
+  },
+  "freeze_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "freeze",
+        0
+      ],
+      "filename_prefix": "freefield/freeze"
+    },
+    "_meta": {
+      "title": "Frozen splash: Save keyframe (also used by the eval)"
+    }
+  }
+}

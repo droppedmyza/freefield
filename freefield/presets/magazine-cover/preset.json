@@ -1,0 +1,47 @@
+{
+  "id": "magazine-cover",
+  "name": "Magazine Cover",
+  "family": "cover",
+  "description": "You on the cover of ICON, the face of the year: a glossy fashion shoot with flashes popping.",
+  "graph": "selfie_header_clip.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "keyframe_noise.noise_seed",
+        "video_sample.seed"
+      ]
+    }
+  },
+  "fixed": {
+    "header.image": "asset:header.png",
+    "keyframe_prompt.text": "Glossy high-fashion magazine cover photo of the person from image 1, posing confidently from the waist up, chin slightly raised, looking straight into the camera with a subtle smile, wearing an elegant black tailored outfit. The same face, hairstyle, skin tone and features as image 1, face large and in sharp focus in the upper half of the frame. Bold solid crimson studio backdrop, dramatic beauty lighting, soft shadows, editorial photography. No text, no letters, no logos anywhere in the image.",
+    "motion_prompt.text": "A fashion photo shoot. The person slowly shifts their pose, turns their shoulders toward the camera and gives a confident smile; their hairstyle stays exactly the same. Bright white camera flashes light up their face. Slow push-in."
+  },
+  "outputs": [
+    "clip_save",
+    "keyframe_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"
+  ],
+  "license": "apache-2.0 weights",
+  "tags": [
+    "cover",
+    "fashion",
+    "celebrity-you"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+ "status": "ready for approval",
+ "errors": [],
+ "schemas": "live",
+ "recipe": {
+  "name": "Pet to Human",
+  "becomes": "an invented human character with the same colors and personality",
+  "motion": "they look at the camera and grin",
+  "reveal": true,
+  "split": false,
+  "title": null,
+  "reference": null,
+  "description": "my cat becomes an invented human character with the same colors and personality, then they look at the camera and grin, with a before/after reveal, named \"Pet to Human\"",
+  "subject": "pet",
+  "keep": false,
+  "caption": false,
+  "profile": "studio",
+  "id": "pet-to-human-studio",
+  "stages": [
+   "transform",
+   "animate",
+   "reveal",
+   "save"
+  ]
+ },
+ "drafted": "2026-10-18T11:40:26+00:00",
+ "preview": {
+  "render_ok": true,
+  "error": null,
+  "clip": true,
+  "description_gain": 0.065,
+  "hybrid_margin": -0.051,
+  "intruder": {
+   "score": 0.0,
+   "frame": null,
+   "label": null
+  },
+  "passed": true,
+  "seed": 42,
+  "render_dir": "render"
+ },
+ "previewed": "2026-10-18T11:30:00+00:00",
+ "preview_photo": "cat-b.png"
+}

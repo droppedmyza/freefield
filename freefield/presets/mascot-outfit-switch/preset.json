@@ -1,0 +1,84 @@
+{
+  "id": "mascot-outfit-switch",
+  "name": "Mascot Outfit Switch",
+  "family": "built",
+  "description": "Your object as the same plush mascot wearing a tiny astronaut suit; then it spins around once. With a before/after reveal.",
+  "graph": "graph.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of the object (a toy, a product, a mascot)",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "keyframe_noise.noise_seed",
+        "video_sample.seed"
+      ]
+    }
+  },
+  "fixed": {
+    "motion_prompt.text": "It spins around once. Smooth, natural motion; the subject stays recognisable. Static shot: the camera holds steady and the background stays still.",
+    "keyframe_prompt.text": "Image 1 is a photo of a object. Remake the object from image 1 completely as the same plush mascot wearing a tiny astronaut suit: change its material and style all the way, but keep its shape, colors and details so it is clearly the same object. The object is the only subject in the picture. Vertical framing, high detail, a clean unmarked photo.",
+    "wipe.file": "asset:mascot-outfit-switch-wipe.mp4"
+  },
+  "outputs": [
+    "clip_save",
+    "keyframe_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "qwen_3_4b_fp8_mixed.safetensors",
+    "flux2-vae.safetensors",
+    "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf",
+    "umt5-xxl-encoder-Q5_K_M.gguf",
+    "wan2.2_vae.safetensors"
+  ],
+  "license": "flux-2-klein-4b-fp8.safetensors apache-2.0; qwen_3_4b_fp8_mixed.safetensors apache-2.0; flux2-vae.safetensors apache-2.0; Wan2_2-TI2V-5B-Turbo-Q6_K.gguf apache-2.0; umt5-xxl-encoder-Q5_K_M.gguf apache-2.0; wan2.2_vae.safetensors apache-2.0",
+  "source": {
+    "made_by": "FreeField effect builder v1",
+    "description": "my mascot becomes the same plush mascot wearing a tiny astronaut suit, then it spins around once, with a before/after reveal, named \"Mascot Outfit Switch\"",
+    "recipe": {
+      "name": "Mascot Outfit Switch",
+      "becomes": "the same plush mascot wearing a tiny astronaut suit",
+      "motion": "it spins around once",
+      "reveal": true,
+      "split": false,
+      "title": null,
+      "reference": null,
+      "description": "my mascot becomes the same plush mascot wearing a tiny astronaut suit, then it spins around once, with a before/after reveal, named \"Mascot Outfit Switch\"",
+      "subject": "object",
+      "keep": false,
+      "caption": false,
+      "id": "mascot-outfit-switch",
+      "stages": [
+        "transform",
+        "animate",
+        "reveal",
+        "save"
+      ]
+    },
+    "created": "2026-10-18T07:16:21+00:00",
+    "approved": "2026-10-18T07:17:26+00:00",
+    "revised": "2026-10-18: motion and keyframe prompts changed to positive-only wording (no 'no tools, no hands, no objects', 'No people' or 'no text, no watermark'); on an A5000 the old motion prompt drew a hand reaching in from the top at seeds 42 and 7 on the owl and at seed 42 on the dinosaur; the positive-only prompts pass every check at all three"
+  },
+  "credits": {
+    "mascot-outfit-switch-wipe.mp4": "FreeField effect builder v1 (wipe mask) (generated)"
+  },
+  "asset_licenses": {
+    "mascot-outfit-switch-wipe.mp4": "generated"
+  },
+  "tags": [
+    "built",
+    "reveal"
+  ],
+  "preview": "preview.mp4"
+}

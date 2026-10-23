@@ -1,0 +1,54 @@
+{
+  "id": "the-scream",
+  "name": "The Scream",
+  "family": "museum",
+  "description": "You, as the screaming figure on the bridge in Munch's The Scream, under that swirling orange sky. The original sits underneath.",
+  "graph": "selfie_art_split.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A clear photo of your face",
+      "bind": [
+        "photo.image"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 42,
+      "min": 0,
+      "max": 2147483647,
+      "bind": [
+        "keyframe_noise.noise_seed",
+        "video_sample.seed"
+      ]
+    }
+  },
+  "fixed": {
+    "artwork.image": "asset:painting.jpg",
+    "artwork_ref.image": "asset:painting_noface.jpg",
+    "keyframe_prompt.text": "Image 2 is an expressionist painting whose face has been left blank. Paint the face and head of the person from image 1 into the blank area, so the painting shows that person as the figure on the bridge: both hands pressed to their cheeks, mouth open in a scream, eyes wide, dark clothes, a long railing running diagonally behind them, a swirling blood-orange sky over a dark blue fjord. Wavy expressionist brushstrokes, Edvard Munch, 1893. It must be the same person as image 1: same face, hairstyle, skin tone, age and gender.",
+    "motion_prompt.text": "An expressionist painting comes to life. The person presses their hands to their cheeks and screams in horror, eyes wide, swaying slightly. The swirling orange sky slowly ripples behind them. Static camera.",
+    "artwork_caption.text": "Munch, 1893"
+  },
+  "outputs": [
+    "clip_save",
+    "keyframe_save"
+  ],
+  "models": [
+    "flux-2-klein-4b-fp8.safetensors",
+    "Wan2_2-TI2V-5B-Turbo-Q6_K.gguf"
+  ],
+  "license": "apache-2.0 weights; painting public domain (Wikimedia Commons)",
+  "credits": {
+    "painting.jpg": "Edvard Munch, The Scream (1893), National Gallery of Norway, public domain, https://commons.wikimedia.org/wiki/File:Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",
+    "painting_noface.jpg": "a crop of painting.jpg around the figure, face blanked by scripts/blank_face.py --box (keyframe reference only)"
+  },
+  "tags": [
+    "painting",
+    "split-screen",
+    "art",
+    "meme"
+  ]
+}

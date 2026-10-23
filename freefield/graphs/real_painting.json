@@ -1,0 +1,432 @@
+{
+  "portrait_in": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": ""
+    },
+    "_meta": {
+      "title": "Frame 0 in the opening (made by freefield.clip_breakout)"
+    }
+  },
+  "backdrop_in": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": ""
+    },
+    "_meta": {
+      "title": "The empty opening (made by freefield.clip_breakout)"
+    }
+  },
+  "klein_model": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b-fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "FLUX.2 klein 4B (Apache-2.0)"
+    }
+  },
+  "klein_te": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Qwen3-4B text encoder"
+    }
+  },
+  "klein_vae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "FLUX.2 VAE"
+    }
+  },
+  "painting_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Repaint image 1 as an oil painting on canvas in the Dutch Golden Age style, with visible brushstrokes and fine craquelure. Change only the medium: keep the same person, the same face and expression, the same pose, the same clothes, the same light and the same composition, with the dark, warm, softly lit background of an old master portrait.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Your portrait: Keyframe prompt (what the still should show)"
+    }
+  },
+  "painting_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "painting_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Your portrait: Empty negative (CFG 1)"
+    }
+  },
+  "painting_portrait_in_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "portrait_in",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Your portrait: Reference 1: encode at its own size"
+    }
+  },
+  "painting_portrait_in_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "painting_prompt",
+        0
+      ],
+      "latent": [
+        "painting_portrait_in_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Your portrait: Attach reference 1 (positive)"
+    }
+  },
+  "painting_portrait_in_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "painting_negative",
+        0
+      ],
+      "latent": [
+        "painting_portrait_in_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Your portrait: Attach reference 1 (negative)"
+    }
+  },
+  "painting_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "painting_portrait_in_ref_pos",
+        0
+      ],
+      "negative": [
+        "painting_portrait_in_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Your portrait: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "painting_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Your portrait: Keyframe seed"
+    }
+  },
+  "painting_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Your portrait: Sampler"
+    }
+  },
+  "painting_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 592,
+      "height": 896
+    },
+    "_meta": {
+      "title": "Your portrait: 4-step schedule"
+    }
+  },
+  "painting_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 592,
+      "height": 896,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Your portrait: Keyframe canvas"
+    }
+  },
+  "painting_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "painting_noise",
+        0
+      ],
+      "guider": [
+        "painting_guider",
+        0
+      ],
+      "sampler": [
+        "painting_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "painting_sigmas",
+        0
+      ],
+      "latent_image": [
+        "painting_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Your portrait: Generate keyframe"
+    }
+  },
+  "painting": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "painting_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Your portrait: Keyframe image"
+    }
+  },
+  "painting_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "painting",
+        0
+      ],
+      "filename_prefix": "freefield/painting"
+    },
+    "_meta": {
+      "title": "Your portrait: Save keyframe (also used by the eval)"
+    }
+  },
+  "backdrop_prompt": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Repaint image 1 as the dark, warm, empty painted background of a Dutch Golden Age oil portrait: visible brushstrokes and fine craquelure, softly lit, with nothing and nobody in it.",
+      "clip": [
+        "klein_te",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty canvas: Keyframe prompt (what the still should show)"
+    }
+  },
+  "backdrop_negative": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "backdrop_prompt",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty canvas: Empty negative (CFG 1)"
+    }
+  },
+  "backdrop_backdrop_in_latent": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "backdrop_in",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty canvas: Reference 1: encode at its own size"
+    }
+  },
+  "backdrop_backdrop_in_ref_pos": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "backdrop_prompt",
+        0
+      ],
+      "latent": [
+        "backdrop_backdrop_in_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty canvas: Attach reference 1 (positive)"
+    }
+  },
+  "backdrop_backdrop_in_ref_neg": {
+    "class_type": "ReferenceLatent",
+    "inputs": {
+      "conditioning": [
+        "backdrop_negative",
+        0
+      ],
+      "latent": [
+        "backdrop_backdrop_in_latent",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty canvas: Attach reference 1 (negative)"
+    }
+  },
+  "backdrop_guider": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "klein_model",
+        0
+      ],
+      "positive": [
+        "backdrop_backdrop_in_ref_pos",
+        0
+      ],
+      "negative": [
+        "backdrop_backdrop_in_ref_neg",
+        0
+      ],
+      "cfg": 1.0
+    },
+    "_meta": {
+      "title": "Empty canvas: Guider (CFG 1 for the distilled model)"
+    }
+  },
+  "backdrop_noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 42
+    },
+    "_meta": {
+      "title": "Empty canvas: Keyframe seed"
+    }
+  },
+  "backdrop_sampler_select": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Empty canvas: Sampler"
+    }
+  },
+  "backdrop_sigmas": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": 4,
+      "width": 592,
+      "height": 896
+    },
+    "_meta": {
+      "title": "Empty canvas: 4-step schedule"
+    }
+  },
+  "backdrop_empty": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 592,
+      "height": 896,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "Empty canvas: Keyframe canvas"
+    }
+  },
+  "backdrop_sample": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "backdrop_noise",
+        0
+      ],
+      "guider": [
+        "backdrop_guider",
+        0
+      ],
+      "sampler": [
+        "backdrop_sampler_select",
+        0
+      ],
+      "sigmas": [
+        "backdrop_sigmas",
+        0
+      ],
+      "latent_image": [
+        "backdrop_empty",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty canvas: Generate keyframe"
+    }
+  },
+  "backdrop": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "backdrop_sample",
+        0
+      ],
+      "vae": [
+        "klein_vae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Empty canvas: Keyframe image"
+    }
+  },
+  "backdrop_save": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "backdrop",
+        0
+      ],
+      "filename_prefix": "freefield/backdrop"
+    },
+    "_meta": {
+      "title": "Empty canvas: Save keyframe (also used by the eval)"
+    }
+  }
+}

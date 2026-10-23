@@ -1,0 +1,48 @@
+{
+  "id": "iris-reveal",
+  "name": "Natural Iris Reveal",
+  "family": "camera",
+  "pipeline": "iris_reveal",
+  "description": "A slow zoom from your selfie into your clearer eye and back out. Only your photo's own pixels are used: nothing on your face is generated or changed. Photos without enough detail in the eye are refused before rendering.",
+  "graph": "iris_reveal.json",
+  "inputs": {
+    "photo": {
+      "type": "image",
+      "label": "A sharp, full-resolution selfie (straight from your phone)",
+      "bind": [
+        "photo.image"
+      ]
+    },
+    "caption": {
+      "type": "text",
+      "label": "Caption (optional)",
+      "required": false,
+      "max_length": 40,
+      "bind": [
+        "pipeline:caption"
+      ]
+    }
+  },
+  "params": {
+    "seed": {
+      "type": "int",
+      "default": 0,
+      "min": 0,
+      "max": 2147483647
+    }
+  },
+  "outputs": [
+    "photo_preview"
+  ],
+  "models": [
+    "face_detection_yunet_2023mar.onnx"
+  ],
+  "license": "YuNet (MIT) finds the eyes; everything else is plain image processing on your own photo",
+  "tags": [
+    "camera",
+    "face",
+    "9:16",
+    "no-gpu"
+  ],
+  "preview": "preview.mp4"
+}

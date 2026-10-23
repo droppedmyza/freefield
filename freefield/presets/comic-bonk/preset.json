@@ -1,0 +1,19 @@
+{
+  "id": "comic-bonk",
+  "name": "Comic Bonk",
+  "family": "toy",
+  "pipeline": "comic_bonk",
+  "description": "A cartoon mallet bonks your mascot: it squashes, springs back, a BONK! burst and circling stars, with a timed bonk and boing. A 3-second loop. Mascots, toys and cartoons only: real people and pets are refused.",
+  "graph": "comic_bonk.json",
+  "inputs": {
+    "photo": {"type": "image", "label": "A photo of a mascot, plush toy or cartoon character", "bind": ["photo.image"]},
+    "word": {"type": "text", "label": "Impact word (optional, default BONK!)", "required": false, "max_length": 12, "bind": ["pipeline:word"]}
+  },
+  "params": {"seed": {"type": "int", "default": 5, "min": 0, "max": 2147483647, "bind": ["plate_noise.noise_seed"]}},
+  "outputs": ["matte_save", "plate_save"],
+  "models": ["birefnet.safetensors", "flux-2-klein-4b-fp8.safetensors"],
+  "license": "BiRefNet (MIT) cut-out and FLUX.2 klein 4B (Apache-2.0) clean plate; the mallet is a FreeField asset generated with klein; motion, lettering and sound are made by FreeField",
+  "preview": "preview.mp4",
+  "asset_licenses": {"mallet.png": "generated", "mallet-matte.png": "generated"},
+  "tags": ["toy", "mascot", "loop", "9:16", "8gb-profile"]
+}
